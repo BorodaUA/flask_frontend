@@ -1,0 +1,21 @@
+/* .application-main{
+    background-color: aqua;
+
+} */
+@font-face {
+    font-family: Inter-Medium;
+    src: url(/news/static/fonts/Inter-Medium.woff2);
+}
+
+body{
+    font-family: Inter-Medium;
+}
+.form_container{
+    /* padding-left: 16px;
+    padding-right: 16px; */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width:510px;
+    width:100%;
+}

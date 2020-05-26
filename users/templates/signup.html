@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="mb-4 mb-md-8 container-md">
+    <div class="mb-4 mb-md-8 container-md text-center">
+        Join Blog
+    </div>
+    <h1 class="mb-4 mb-md-8 container-md text-center">
+        Create your account
+    </h1>
+</div>
+<div class="form_container">
+    <form class="signup_form" method="post" action="{{ url_for('users.signup_page_func')}}">
+        {{ form.csrf_token }}
+        {{ form.username.label }}
+        {{ form.username(class_="form-control") }}
+        <br>
+        {{ form.email_address.label }}
+        {{ form.email_address(class_="form-control") }}
+        <br>
+        {{ form.password.label }}
+        {{ form.password(class_="form-control") }}
+        <p>Make sure it's at least 8 characters including a number and a lowercase letter.</p>
+        <br>
+        {% for key, value in form.errors.items() %}
+            {% for error_message in value %}
+            <li>{{ error_message }}</li>
+            {% endfor %}
+        {% endfor %}
+        <br>
+        <input class="btn btn-primary" type="submit" value="Create account">
+            
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-4 mb-md-8 container-md text-center" >
+<br>
+<br>
+<h1>Sign in to Blog</h1>
+</div>
+<br>
+<br>
+<div class="form_container">
+    <form class="signin_form" method="post" action="{{ url_for('users.signin_page_func')}}">
+        {{ form.csrf_token }}
+
+        <p>Username or email address</p>
+        {{ form.username(class_="form-control") }}
+        <br>
+        <p>Password</p>
+        {{ form.password(class_="form-control") }}
+        <br>
+        {% for key, value in form.errors.items() %}
+            {% for error_message in value %}
+                <li>{{ error_message }}</li>
+            {% endfor %}
+        {% endfor %}
+        <br>
+        <input class="btn btn-primary" type="submit" value="Sign in">
+        
+    </form>
+
+</div>
+{% endblock %}

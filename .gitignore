@@ -1,0 +1,13 @@
+.pytest_cache
+__pycache__
+.vscode
+.env
+
+/errors/__pycache__
+
+/flask_front_1/__pycache__
+/news/__pycache__
+/tests/__pycache__
+/tests/.pytest_cache
+/users/__pycache__
+/users/libs/__pycache__
