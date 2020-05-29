@@ -18,7 +18,7 @@ def top_news_page(page_number):
     """
     A view func for '/' endpoint, aftef first page for /news/<page_number>
     """
-    print(session)
+    # print(session)
     api_request = requests.post(
         f"http://127.0.0.1:4000/api/hacker_news/top_stories/{page_number}",
         json={"page_number": page_number},
@@ -27,10 +27,43 @@ def top_news_page(page_number):
         api_response = api_request.json()
     elif api_request.status_code == 400:
         abort(404)
-    resp = make_response(render_template("news.html", top_stories=api_response))
+    resp = make_response(
+        render_template(
+            "news.html",
+            stories=api_response,
+            current_view_func="news.top_news_page_func",
+            story_view_func="news.story_page_func",
+        )
+    )
     return resp
 
 
+@jwt_optional
+def new_news_page(page_number):
+    """
+    A view func for '/newest' endpoint, aftef first page for /newest/<page_number>
+    """
+    # print(session)
+    api_request = requests.post(
+        f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
+        json={"page_number": page_number},
+    )
+    if api_request.status_code == 200:
+        api_response = api_request.json()
+    elif api_request.status_code == 400:
+        abort(404)
+    resp = make_response(
+        render_template(
+            "news.html",
+            stories=api_response,
+            current_view_func="news.new_news_page_func",
+            story_view_func="news.story_page_func",
+        )
+    )
+    return resp
+
+
+@jwt_optional
 def story_page(story_id):
     """
     A view func for /story/<story_id> endpoint
@@ -41,8 +74,15 @@ def story_page(story_id):
     )
     if api_request.status_code == 200:
         api_response = api_request.json()
+
+    elif api_request.status_code == 400:
+        api_request = requests.post(
+            f"http://127.0.0.1:4000/api/hacker_news/new_stories/story/{story_id}",
+            json={"story_id": story_id},
+        )
     elif api_request.status_code == 400:
         abort(404)
+    api_response = api_request.json()
     resp = make_response(render_template("story.html", story=api_response))
     return resp
 
@@ -75,4 +115,15 @@ news_bp.add_url_rule(
 )
 news_bp.add_url_rule(
     "/story/<int:story_id>", "story_page_func", story_page, methods=["GET"]
+)
+###
+news_bp.add_url_rule(
+    "/newest",
+    "new_news_page_func",
+    new_news_page,
+    methods=["GET"],
+    defaults={"page_number": 1},
+)
+news_bp.add_url_rule(
+    "/newest/<int:page_number>", "new_news_page_func", new_news_page, methods=["GET"]
 )
