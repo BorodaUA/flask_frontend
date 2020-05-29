@@ -19,3 +19,11 @@ body{
     max-width:510px;
     width:100%;
 }
+
+.title_url{
+    color: inherit;
+    text-decoration: none !important;
+}
+.title_url:hover {
+    color: inherit;
+}

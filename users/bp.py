@@ -59,7 +59,7 @@ def signup_page():
                     expires_delta=datetime.timedelta(minutes=1),
                 )
                 signup_response = make_response(
-                    redirect(url_for("news.home_page_func"), 302)
+                    redirect(url_for("news.top_news_page_func"), 302)
                 )
                 set_access_cookies(signup_response, access_token)
                 set_refresh_cookies(signup_response, refresh_token)
@@ -77,7 +77,7 @@ def logout_page():
     """
     A view func for a '/logout' endpoint.
     """
-    resp = make_response(redirect(url_for("news.home_page_func")))
+    resp = make_response(redirect(url_for("news.top_news_page_func")))
     # resp.set_cookie('user_uuid', '', httponly=True)
     unset_jwt_cookies(resp)
     # session.clear()

@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, make_response, session
+from flask import Blueprint, render_template, request, make_response, session, abort
 from flask_jwt_extended import jwt_optional, get_jwt_identity
 import base64
 from uuid import uuid4
+import requests
 
 news_bp = Blueprint(
     "news",
@@ -13,35 +14,37 @@ news_bp = Blueprint(
 
 
 @jwt_optional
-def news_page():
+def top_news_page(page_number):
     """
-    A view func for '/' endpoint
+    A view func for '/' endpoint, aftef first page for /news/<page_number>
     """
     print(session)
-    # if not session:
-    #     session['device_id'] = request.cookies.get('device_uuid')
-    #     session['user_uuid'] = ''
-    current_user = get_jwt_identity()
-    # access_token_cookie = request.cookies.get('access_token_cookie')
-    # cookie_uuid = request.cookies.get('user_uuid')
-    # print('jwt_itentity',current_user)
-    resp = make_response(render_template("base.html", user_data=current_user))
-    # if request.cookies.get('device_uuid') == None:
-    #     resp.set_cookie('device_uuid', uuid_gen())
-    # if request.cookies.get('user_uuid') == None:
-    #     resp.set_cookie('user_uuid', '')
-    # print('this is the session ',session)
-    # a = b / 2
-    # print(request.cookies)
-    # print(current_user)
+    api_request = requests.post(
+        f"http://127.0.0.1:4000/api/hacker_news/top_stories/{page_number}",
+        json={"page_number": page_number},
+    )
+    if api_request.status_code == 200:
+        api_response = api_request.json()
+    elif api_request.status_code == 400:
+        abort(404)
+    resp = make_response(render_template("news.html", top_stories=api_response))
     return resp
 
 
-def uuid_gen():
+def story_page(story_id):
     """
-    Making string with a unique uuid
+    A view func for /story/<story_id> endpoint
     """
-    return str(uuid4())
+    api_request = requests.post(
+        f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}",
+        json={"story_id": story_id},
+    )
+    if api_request.status_code == 200:
+        api_response = api_request.json()
+    elif api_request.status_code == 400:
+        abort(404)
+    resp = make_response(render_template("story.html", story=api_response))
+    return resp
 
 
 @news_bp.after_app_request
@@ -51,12 +54,25 @@ def add_cookie(response):
     Setting 'device_uuid' with a unique uuid inside the session.
     Called on all requests, and on any endpoint.
     """
-    new_uuid = uuid_gen()
+    new_uuid = str(uuid4())
     if request.cookies.get("device_uuid") == None:
         response.set_cookie("device_uuid", new_uuid)
-    if not session:
-        session["device_uuid"] = new_uuid
+    if session.get("device_uuid") == None:
+        if request.cookies.get("device_uuid") != None:
+            session["device_uuid"] = request.cookies.get("device_uuid")
     return response
 
 
-news_bp.add_url_rule("/", "home_page_func", news_page, methods=["GET"])
+news_bp.add_url_rule(
+    "/news/<int:page_number>", "top_news_page_func", top_news_page, methods=["GET"]
+)
+news_bp.add_url_rule(
+    rule="/",
+    endpoint="top_news_page_func",
+    view_func=top_news_page,
+    methods=["GET"],
+    defaults={"page_number": 1},
+)
+news_bp.add_url_rule(
+    "/story/<int:story_id>", "story_page_func", story_page, methods=["GET"]
+)

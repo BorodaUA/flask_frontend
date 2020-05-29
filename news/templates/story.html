@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <br>
+    <h1>Story page</h1>
+<div class="story">
+    <div class="card">
+        <a class="title_url" href="#"><h5 class="card-header">{{story.title}}</h5></a>
+        <div class="card-body">
+          <h5 class="card-title">{{story.by}}</h5>
+          <a href={{story.hn_url}}><p class="card-text">{{story.hn_url}}</p></a>
+          <a href="{{story.url}}" class="btn btn-primary">Story url</a>
+          <a href="#" class="btn btn-primary">{{story.score}}</a>
+        </div>
+      </div>
+</div>
+<h1>Comments:</h1>
+{% for comment in story.child_comments%}
+    <div class="story">
+        <div class="card">
+            <a class="title_url" href="#"><h5 class="card-header">{{comment.by}}</h5></a>
+            <div class="card-body">
+              <h5 class="card-title">{{comment.text|safe}}</h5>
+            </div>
+          </div>
+    </div>
+    <br>
+{% endfor %}
+
+</div>
+{% endblock %}

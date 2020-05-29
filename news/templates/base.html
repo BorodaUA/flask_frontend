@@ -9,19 +9,19 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <link rel="shortcut icon" href="{{ url_for('news.static', filename='favicon/monitor.png') }}">
-    <link rel="stylesheet" href="{{ url_for('news.static', filename='css/signup.css') }}">
+    <link rel="stylesheet" href="{{ url_for('news.static', filename='css/base.css') }}">
 
   </head>
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-end">
-    <a class="navbar-brand" href="/">Blog</a>
+    <a class="navbar-brand" href="{{url_for('news.top_news_page_func', page_number=1)}}">Blog</a>
     <a class="ml-auto mr-1"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
         <ul class="navbar-nav text-right">
-          {% if not user_data %}
+          {% if not user_uuid %}
           <li class="nav-item active">
             <a class="flex-sm-fill text-sm-center nav-link active my-2 my-sm-0" href="{{ url_for('users.signup_page_func')}}">Sign up</a>
           </li>
@@ -29,9 +29,9 @@
             <a class="nav-link" href="{{ url_for('users.signin_page_func')}}">Sign in</a>
           </li>
           {% endif %}
-          {% if user_data %}
+          {% if user_uuid %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('users.user_profile_page_func', user_uuid=user_data)}}">User Profile</a>
+            <a class="nav-link" href="{{ url_for('users.user_profile_page_func', user_uuid=user_uuid)}}">User Profile</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('users.logout_page_func')}}">Logout</a>
