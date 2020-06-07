@@ -47,7 +47,6 @@ def test_blog(client):
 
 def test_login_valid_username_and_valid_password(client):
     response = login(client, username="bob_2", password="123")
-    print(response)
     assert b"Hello user:" in response.data
 
 
@@ -58,7 +57,6 @@ def test_login_invalid_username_valid_password(client):
 
 def test_login_incorrect_password(client):
     response = login(client, username="bob_2", password="12345")
-    print(response.data)
     assert b"Username or password Incorect!" in response.data
 
 

@@ -3,7 +3,7 @@
 
 <div class="container">
     <h1>News page</h1>
-
+{% if stories %}
 {% for item in stories['items'] %}
     <div class="story">
         <div class="card">
@@ -64,4 +64,5 @@
 
 
 </div>
+{% endif %}
 {% endblock %}

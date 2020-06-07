@@ -19,13 +19,20 @@ def top_news_page(page_number):
     A view func for '/' endpoint, aftef first page for /news/<page_number>
     """
     # print(session)
-    api_request = requests.post(
-        f"http://127.0.0.1:4000/api/hacker_news/top_stories/{page_number}",
-        json={"page_number": page_number},
-    )
-    if api_request.status_code == 200:
-        api_response = api_request.json()
-    elif api_request.status_code == 400:
+    try:
+        api_request = requests.post(
+            f"http://127.0.0.1:4000/api/hacker_news/top_stories/{page_number}",
+            json={"page_number": page_number},
+        )
+    except requests.exceptions.ConnectionError:
+        api_request = None
+        api_response = None
+    if api_request:
+        if api_request.status_code == 200:
+            api_response = api_request.json()
+        elif api_request.status_code == 400:
+            abort(404)
+    else:
         abort(404)
     resp = make_response(
         render_template(
@@ -44,13 +51,20 @@ def new_news_page(page_number):
     A view func for '/newest' endpoint, aftef first page for /newest/<page_number>
     """
     # print(session)
-    api_request = requests.post(
-        f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
-        json={"page_number": page_number},
-    )
-    if api_request.status_code == 200:
-        api_response = api_request.json()
-    elif api_request.status_code == 400:
+    try:
+        api_request = requests.post(
+            f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
+            json={"page_number": page_number},
+        )
+    except requests.exceptions.ConnectionError:
+        api_request = None
+        api_response = None
+    if api_request:
+        if api_request.status_code == 200:
+            api_response = api_request.json()
+        elif api_request.status_code == 400:
+            abort(404)
+    else:
         abort(404)
     resp = make_response(
         render_template(
@@ -68,21 +82,25 @@ def story_page(story_id):
     """
     A view func for /story/<story_id> endpoint
     """
-    api_request = requests.post(
+    api_request_top_stories = requests.post(
         f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}",
         json={"story_id": story_id},
     )
-    if api_request.status_code == 200:
-        api_response = api_request.json()
-
-    elif api_request.status_code == 400:
-        api_request = requests.post(
+    api_request_new_stories = requests.post(
             f"http://127.0.0.1:4000/api/hacker_news/new_stories/story/{story_id}",
             json={"story_id": story_id},
         )
-    elif api_request.status_code == 400:
-        abort(404)
-    api_response = api_request.json()
+    if api_request_top_stories.status_code == 400:
+        api_request_new_stories = requests.post(
+            f"http://127.0.0.1:4000/api/hacker_news/new_stories/story/{story_id}",
+            json={"story_id": story_id},
+        )
+        if api_request_new_stories.status_code == 400:
+            abort(404)
+        else:
+            api_response = api_request_new_stories.json()
+    else:
+        api_response = api_request_top_stories.json()
     resp = make_response(render_template("story.html", story=api_response))
     return resp
 
