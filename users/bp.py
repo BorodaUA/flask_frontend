@@ -94,56 +94,54 @@ def signin_page():
     signin_form = LoginForm()
     if request.method == "GET":
         return render_template("signin.html", form=signin_form)
-    elif request.method == "POST":
-        if signin_form.validate_on_submit():
-            api_request_data = {
-                "username": signin_form.username.data,
-                "email_address": signin_form.username.data,
-                "password": signin_form.password.data,
-            }
-            api_request = requests.post(
-                "http://127.0.0.1:4000/api/users/signin", json=api_request_data
+    if request.method == "POST" and signin_form.validate_on_submit():
+        api_request_data = {
+            "username": signin_form.username.data,
+            "email_address": signin_form.username.data,
+            "password": signin_form.password.data,
+        }
+        api_request = requests.post(
+            "http://127.0.0.1:4000/api/users/signin", json=api_request_data
+        )
+        if api_request.status_code == 200:
+            api_response = api_request.json()
+            access_token = create_access_token(
+                identity=api_response["username"],
+                fresh=True,
+                expires_delta=datetime.timedelta(minutes=5),
             )
-            if api_request.status_code == 200:
-                api_response = api_request.json()
-                access_token = create_access_token(
-                    identity=api_response["user_uuid"],
-                    fresh=True,
-                    expires_delta=datetime.timedelta(minutes=1),
+            refresh_token = create_refresh_token(
+                identity=api_response["username"],
+                expires_delta=datetime.timedelta(minutes=5),
+            )
+            signin_response = make_response(
+                redirect(
+                    url_for(
+                        "users.user_profile_page_func",
+                        username=api_response["username"],
+                    ),
+                    302,
                 )
-                refresh_token = create_refresh_token(
-                    identity=api_response["user_uuid"],
-                    expires_delta=datetime.timedelta(minutes=1),
-                )
-                signin_response = make_response(
-                    redirect(
-                        url_for(
-                            "users.user_profile_page_func",
-                            user_uuid=api_response["user_uuid"],
-                        ),
-                        302,
-                    )
-                )
-                set_access_cookies(signin_response, access_token)
-                set_refresh_cookies(signin_response, refresh_token)
-                return signin_response
-            else:
-                api_response = api_request.json()
-                signin_form.username.errors.append(api_response["message"])
-                return render_template("signin.html", form=signin_form)
+            )
+            set_access_cookies(signin_response, access_token)
+            set_refresh_cookies(signin_response, refresh_token)
+            return signin_response
         else:
+            api_response = api_request.json()
+            signin_form.username.errors.append(api_response["message"])
             return render_template("signin.html", form=signin_form)
+    else:
+        return render_template("signin.html", form=signin_form)
 
 
 @jwt_required
-def user_profile_page(user_uuid):
+def user_profile_page(username):
     """
-    A view func for a '/users/profile/<user_uuid>' endpoint.
+    A view func for a '/users/profile/<username>' endpoint.
     """
-    # print(session)
     current_user = get_jwt_identity()
     # access_token_cookie = request.cookies.get('access_token_cookie')
-    # cookie_uuid = request.cookies.get('user_uuid')
+    # cookie_uuid = request.cookies.get('username')
     return render_template("user_profile.html", user_data=current_user)
 
 
@@ -155,7 +153,7 @@ users_bp.add_url_rule(
 )
 users_bp.add_url_rule("/logout", "logout_page_func", logout_page, methods=["GET"])
 users_bp.add_url_rule(
-    "/users/profile/<user_uuid>",
+    "/users/profile/<username>",
     "user_profile_page_func",
     user_profile_page,
     methods=["GET"],

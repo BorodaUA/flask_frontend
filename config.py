@@ -1,16 +1,14 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 class Config(object):
 
     SECRET_KEY = os.environ.get("SECRET_KEY") or "hard to guess string"
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
-    JWT_TOKEN_LOCATION = os.environ.get("JWT_TOKEN_LOCATION")
-    JWT_COOKIE_CSRF_PROTECT = os.environ.get("JWT_COOKIE_CSRF_PROTECT")
-    JWT_CSRF_CHECK_FORM = os.environ.get("JWT_CSRF_CHECK_FORM")
+    JWT_TOKEN_LOCATION = "cookies"
+    JWT_COOKIE_CSRF_PROTECT = False
+    JWT_CSRF_CHECK_FORM = False
+    WTF_CSRF_ENABLED = True
 
 
 class DevelopmentConfig(Config):

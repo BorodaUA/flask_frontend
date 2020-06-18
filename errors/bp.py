@@ -24,7 +24,7 @@ def register_error_handlers(app):
     """
 
     @app.errorhandler(400)
-    def show_404_page(*args, **kwargs):
+    def show_400_page(*args, **kwargs):
         """
         400 error handler
         """
@@ -50,6 +50,7 @@ def no_jwt_on_protected_endpoint(message):
     Making a redirect to the /login endpoint, and unsets all jwt cookies.
     When no jwt cookies were provided on the protected endpoint.
     """
+    print(message)
     return expired_tokens()
 
 

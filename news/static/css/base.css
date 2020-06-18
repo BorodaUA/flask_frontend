@@ -27,3 +27,6 @@ body{
 .title_url:hover {
     color: inherit;
 }
+[id^="edit_comment_form"]{
+    display: none;
+}
