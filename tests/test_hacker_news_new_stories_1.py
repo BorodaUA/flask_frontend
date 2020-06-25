@@ -25,11 +25,6 @@ def test_news_page_hacker_news_new_stories_back_end_on(client):
     assert b"Previous" in response.data
 
 
-def test_news_page_hacker_news_new_stories_back_end_off(client):
-    response = client.get("/")
-    assert b"Previous" not in response.data
-
-
 def test_news_page_last_pagination_page_hacker_news_new_stories(client):
     """
     top stories test valid, last pagination page

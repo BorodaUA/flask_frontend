@@ -118,7 +118,9 @@ def story_page(story_id):
             render_template("story.html", story=api_response, form=comment_form,)
         )
         return resp
+    request
     if request.method == "POST" and comment_form.validate_on_submit():
+        api_request_method = comment_form.method_type.data
         api_request_data = {
             "parse_dt": datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")[:-3],
             "by": current_user,
@@ -132,18 +134,33 @@ def story_page(story_id):
             "time": int(time.time()),
             "comment_type": "comment",
         }
-        if api_request_data["existed_comment_id"] == "":
-            api_request_data["existed_comment_id"] = 0
-        api_request_add_comment = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
-            json=api_request_data,
-        )
-        coment_response = make_response(
-            redirect(url_for("news.story_page_func", story_id=story_id), 302)
-        )
-        return coment_response
+        if api_request_method == "POST":
+            api_request_add_comment = requests.post(
+                f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
+                json=api_request_data,
+            )
+            if api_request_add_comment.status_code == 400:
+                abort(404)
+        elif api_request_method == "PUT":
+            api_request_update_comment = requests.put(
+                f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
+                json=api_request_data,
+            )
+            if api_request_update_comment.status_code == 400:
+                abort(404)
+        elif api_request_method == "DELETE":
+            api_request_delete_comment = requests.delete(
+                f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
+                json=api_request_data,
+            )
+            if api_request_delete_comment.status_code == 400:
+                abort(404)
+        else:
+            abort(404)
+    else:
+        abort(404)
     resp = make_response(
-        render_template("story.html", story=api_response, form=comment_form,)
+        redirect(url_for("news.story_page_func", story_id=story_id), 302)
     )
     return resp
 

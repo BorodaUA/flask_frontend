@@ -20,6 +20,7 @@
 <div id="edit_comment">
 <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.item_id)}}">
   {{ form.csrf_token }}
+  {{ form.method_type(value="POST") }}
   {{ form.comment_deleted}}
   <p>Add comment:</p>
   {{ form.comment_text(class_="form-control") }}
@@ -33,7 +34,6 @@
 {% endif %}
 <h1>Comments:</h1>
 {% for comment in story.comments%}
-  {% if comment.deleted == False %}
   <div id="comment {{ comment.comment_id }}">
     <div class="story">
         <div class="card">
@@ -44,13 +44,16 @@
           </div>
           {% if user_uuid == comment.by %}
           <button id="edit_comment_btn {{ comment.comment_id }}" onclick="showEditComment({{comment.comment_id}})" class="btn btn-primary">Edit</button>  
+          
           {% endif %}
     </div>
 
   </div>
+  {% if user_uuid == comment.by %}
   <div id="edit_comment_form {{ comment.comment_id }}">
     <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.item_id)}}">
       {{form.csrf_token}}
+      {{ form.method_type }}
       {{ form.comment_deleted(id="comment_deleted {}".format(comment.comment_id)) }}
       {{ form.existed_comment_id(id="existed_comment_id {}".format(comment.comment_id)) }}
       {{ form.existed_comment_text(id="existed_comment_text {}".format(comment.comment_id)) }}
@@ -63,8 +66,8 @@
     </form>
     
     </div>
-    {% endif %}    
-    <br>
+    {% endif %}  
+  <br>
 {% endfor %}
 
 </div>
@@ -79,15 +82,14 @@ function showEditComment(comment_id, story_id) {
   var comment_form = document.getElementById("edit_comment_form "+comment_id);
   comment.style.display = "none";
   comment_form.style.display = "block";
-
-  comment_form.firstElementChild[2].value = comment_id;
-  comment_form.firstElementChild[3].value = comment_text;
+  comment_form.firstElementChild[1].value = "PUT"
+  comment_form.firstElementChild[3].value = comment_id;
   comment_form.firstElementChild[4].value = comment_text;
-  comment_form.firstElementChild[4].focus();
+  comment_form.firstElementChild[5].value = comment_text;
+  comment_form.firstElementChild[5].focus();
   delete_btn.onclick = function(){
-    console.log(delete_btn)
-    comment_form.firstElementChild[1].value = true
-    console.log(comment_form.firstElementChild[1].value)
+    comment_form.firstElementChild[1].value = "DELETE"
+    comment_form.firstElementChild[2].value = true
   }
 
 }

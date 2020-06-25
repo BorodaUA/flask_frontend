@@ -28,14 +28,6 @@ def test_news_page_hacker_news_top_stories_back_end_on(client):
     assert b"Previous" in response.data
 
 
-def test_news_page_hacker_news_top_stories_back_end_off(client):
-    """
-    test do back end service is off
-    """
-    response = client.get("/")
-    assert b"Previous" not in response.data
-
-
 def test_news_page_last_pagination_page_hacker_news_top_stories(client):
     page_number = 1
     try:

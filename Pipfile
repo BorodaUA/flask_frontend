@@ -15,6 +15,7 @@ pytest = "*"
 python-dotenv = "*"
 coverage = "*"
 black = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.8"
