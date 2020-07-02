@@ -63,3 +63,13 @@ def expired_tokens():
     resp = make_response(redirect(url_for("news.top_news_page_func")), 302)
     unset_jwt_cookies(resp)
     return resp
+
+
+@jwt.user_claims_loader
+def add_claims_to_access_token(user):
+    return {"user_origin": user.origin}
+
+
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.username

@@ -30,6 +30,12 @@ import datetime
 users_bp = Blueprint("users", __name__, template_folder="templates")
 
 
+class UserObject:
+    def __init__(self, username, origin):
+        self.username = username
+        self.origin = origin
+
+
 def signup_page():
     """
     A view func for a '/signup' endpoint.
@@ -49,14 +55,16 @@ def signup_page():
             )
             if api_request.status_code == 201:
                 api_response = api_request.json()
+                user = UserObject(
+                    username=api_response["username"], origin=api_response["origin"]
+                )
                 access_token = create_access_token(
-                    identity=api_response["user_uuid"],
+                    identity=user,
                     fresh=True,
-                    expires_delta=datetime.timedelta(minutes=1),
+                    expires_delta=datetime.timedelta(minutes=10),
                 )
                 refresh_token = create_refresh_token(
-                    identity=api_response["user_uuid"],
-                    expires_delta=datetime.timedelta(minutes=1),
+                    identity=user, expires_delta=datetime.timedelta(minutes=10),
                 )
                 signup_response = make_response(
                     redirect(url_for("news.top_news_page_func"), 302)
@@ -105,14 +113,14 @@ def signin_page():
         )
         if api_request.status_code == 200:
             api_response = api_request.json()
+            user = UserObject(
+                username=api_response["username"], origin=api_response["origin"]
+            )
             access_token = create_access_token(
-                identity=api_response["username"],
-                fresh=True,
-                expires_delta=datetime.timedelta(minutes=5),
+                identity=user, fresh=True, expires_delta=datetime.timedelta(minutes=10),
             )
             refresh_token = create_refresh_token(
-                identity=api_response["username"],
-                expires_delta=datetime.timedelta(minutes=5),
+                identity=user, expires_delta=datetime.timedelta(minutes=10),
             )
             signin_response = make_response(
                 redirect(
@@ -134,7 +142,7 @@ def signin_page():
         return render_template("signin.html", form=signin_form)
 
 
-@jwt_required
+@jwt_optional
 def user_profile_page(username):
     """
     A view func for a '/users/profile/<username>' endpoint.
@@ -142,7 +150,10 @@ def user_profile_page(username):
     current_user = get_jwt_identity()
     # access_token_cookie = request.cookies.get('access_token_cookie')
     # cookie_uuid = request.cookies.get('username')
-    return render_template("user_profile.html", user_data=current_user)
+
+    return render_template(
+        "user_profile.html", user_data=current_user, username=username
+    )
 
 
 users_bp.add_url_rule(

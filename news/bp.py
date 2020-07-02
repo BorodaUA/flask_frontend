@@ -30,6 +30,7 @@ def top_news_page(page_number):
     """
     A view func for '/' endpoint, aftef first page for /news/<page_number>
     """
+    print(session)
     try:
         api_request = requests.post(
             f"http://127.0.0.1:4000/api/hacker_news/top_stories/{page_number}",
@@ -133,6 +134,7 @@ def story_page(story_id):
             "text": comment_form.comment_text.data,
             "time": int(time.time()),
             "comment_type": "comment",
+            "origin": "my_blog",
         }
         if api_request_method == "POST":
             api_request_add_comment = requests.post(

@@ -26,30 +26,29 @@
   {{ form.comment_text(class_="form-control") }}
   <br>
   <input class="btn btn-primary" type="submit" value="Add Comment">  
-
 </form>
 </div>
 <!-- end comment form -->
 <br>
 {% endif %}
+
 <h1>Comments:</h1>
 {% for comment in story.comments%}
+
   <div id="comment {{ comment.comment_id }}">
     <div class="story">
         <div class="card">
-            <a class="title_url" href="#"><h5 class="card-header">{{comment.by}}</h5></a>
+            <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
             <div class="card-body">
               <h5 id="comment_text {{ comment.comment_id }}" class="card-title">{{comment.text|safe}}</h5>
             </div>
           </div>
-          {% if user_uuid == comment.by %}
+          {% if user_uuid == comment.by and user_origin == comment.origin %}
           <button id="edit_comment_btn {{ comment.comment_id }}" onclick="showEditComment({{comment.comment_id}})" class="btn btn-primary">Edit</button>  
-          
-          {% endif %}
     </div>
-
+    {% endif %}  
   </div>
-  {% if user_uuid == comment.by %}
+      {% if user_uuid == comment.by %}
   <div id="edit_comment_form {{ comment.comment_id }}">
     <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.item_id)}}">
       {{form.csrf_token}}
@@ -66,7 +65,7 @@
     </form>
     
     </div>
-    {% endif %}  
+      {% endif %}  
   <br>
 {% endfor %}
 

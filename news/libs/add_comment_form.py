@@ -5,8 +5,8 @@ from wtforms.widgets import HiddenInput
 
 
 class AddCommentForm(FlaskForm):
-    method_type = TextField(widget=HiddenInput(), default='POST')
+    method_type = TextField(widget=HiddenInput(), default="POST")
     comment_deleted = HiddenField(default=False)
     existed_comment_id = IntegerField(widget=HiddenInput(), default=0)
-    existed_comment_text = TextField(widget=HiddenInput(), default='')
+    existed_comment_text = TextField(widget=HiddenInput(), default="")
     comment_text = TextAreaField(validators=[InputRequired()])

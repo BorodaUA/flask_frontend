@@ -37,6 +37,7 @@ def get_first_top_story_data():
     first_story_url = api_response["items"][0]["url"]
     return first_story_id, first_story_url
 
+
 def get_first_top_story_comments():
     first_story_id = get_first_top_story_data()[0]
     try:
@@ -50,6 +51,7 @@ def get_first_top_story_comments():
     api_response = api_request.json()
     first_story_first_comment = api_response[0]
     return first_story_first_comment
+
 
 def login(client):
     response = client.post(
@@ -81,9 +83,9 @@ def test_first_story_page_add_comment_and_delete_comment_logged_in_user(client):
     by logged in user
     """
     first_story_id = get_first_top_story_data()[0]
-    resp_cook =  login(client)
-    access_token = resp_cook.headers[3][1].split(';')[0].split('=')[1]
-    client.set_cookie('localhost', 'access_token_cookie', access_token)
+    resp_cook = login(client)
+    access_token = resp_cook.headers[3][1].split(";")[0].split("=")[1]
+    client.set_cookie("localhost", "access_token_cookie", access_token)
     add_comment = client.post(
         f"/story/{first_story_id}",
         data={
@@ -101,7 +103,7 @@ def test_first_story_page_add_comment_and_delete_comment_logged_in_user(client):
     comment_text = bytes("text from testing", "utf-8")
     # parsing
     tree = html.fromstring(add_comment.data)
-    comment_id = tree.xpath('//div[@class="container"]/div[3]/@id')[0].split(' ')[1]
+    comment_id = tree.xpath('//div[@class="container"]/div[3]/@id')[0].split(" ")[1]
     #
     assert comment_text in add_comment.data
     delete_comment = client.post(
@@ -121,15 +123,17 @@ def test_first_story_page_add_comment_and_delete_comment_logged_in_user(client):
     assert comment_text not in delete_comment.data
 
 
-def test_first_story_page_add_comment_then_edit_and_delete_comment_logged_in_user(client):
+def test_first_story_page_add_comment_then_edit_and_delete_comment_logged_in_user(
+    client,
+):
     """
     test adding then editing and deleting a comment to the first story page
     by logged in user
     """
     first_story_id = get_first_top_story_data()[0]
-    resp_cook =  login(client)
-    access_token = resp_cook.headers[3][1].split(';')[0].split('=')[1]
-    client.set_cookie('localhost', 'access_token_cookie', access_token)
+    resp_cook = login(client)
+    access_token = resp_cook.headers[3][1].split(";")[0].split("=")[1]
+    client.set_cookie("localhost", "access_token_cookie", access_token)
     add_comment = client.post(
         f"/story/{first_story_id}",
         data={
@@ -147,7 +151,7 @@ def test_first_story_page_add_comment_then_edit_and_delete_comment_logged_in_use
     add_comment_text = bytes("text from testing", "utf-8")
     # parsing
     tree = html.fromstring(add_comment.data)
-    comment_id = tree.xpath('//div[@class="container"]/div[3]/@id')[0].split(' ')[1]
+    comment_id = tree.xpath('//div[@class="container"]/div[3]/@id')[0].split(" ")[1]
     #
     assert add_comment_text in add_comment.data
     ###
@@ -167,7 +171,7 @@ def test_first_story_page_add_comment_then_edit_and_delete_comment_logged_in_use
     )
     edit_comment_text = bytes("edited text from testing", "utf-8")
     tree = html.fromstring(edit_comment.data)
-    comment_id = tree.xpath('//div[@class="container"]/div[3]/@id')[0].split(' ')[1]
+    comment_id = tree.xpath('//div[@class="container"]/div[3]/@id')[0].split(" ")[1]
     assert edit_comment_text in edit_comment.data
     ####
     delete_comment = client.post(
@@ -186,20 +190,21 @@ def test_first_story_page_add_comment_then_edit_and_delete_comment_logged_in_use
     )
     assert edit_comment_text not in delete_comment.data
 
+
 def test_first_story_page_add_comment_logged_in_user_comment_deleted_wrong_type(client):
     """
     test adding a comment to the first story page
     by logged in user, wrong comment_deleted type
     """
     first_story_id = get_first_top_story_data()[0]
-    resp_cook =  login(client)
-    access_token = resp_cook.headers[3][1].split(';')[0].split('=')[1]
-    client.set_cookie('localhost', 'access_token_cookie', access_token)
+    resp_cook = login(client)
+    access_token = resp_cook.headers[3][1].split(";")[0].split("=")[1]
+    client.set_cookie("localhost", "access_token_cookie", access_token)
     add_comment = client.post(
         f"/story/{first_story_id}",
         data={
             "by": "bob_2",
-            "comment_deleted": ['wrong'],
+            "comment_deleted": ["wrong"],
             "comment_text": "text from testing",
             "existed_comment_id": "",
             "existed_comment_text": "",
@@ -209,7 +214,7 @@ def test_first_story_page_add_comment_logged_in_user_comment_deleted_wrong_type(
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
 def test_first_story_page_add_comment_logged_in_user_comment_text_wrong_type(client):
@@ -218,15 +223,15 @@ def test_first_story_page_add_comment_logged_in_user_comment_text_wrong_type(cli
     by logged in user, wrong comment_text type
     """
     first_story_id = get_first_top_story_data()[0]
-    resp_cook =  login(client)
-    access_token = resp_cook.headers[3][1].split(';')[0].split('=')[1]
-    client.set_cookie('localhost', 'access_token_cookie', access_token)
+    resp_cook = login(client)
+    access_token = resp_cook.headers[3][1].split(";")[0].split("=")[1]
+    client.set_cookie("localhost", "access_token_cookie", access_token)
     add_comment = client.post(
         f"/story/{first_story_id}",
         data={
             "by": "bob_2",
             "comment_deleted": False,
-            "comment_text": {"text from testing":111},
+            "comment_text": {"text from testing": 111},
             "existed_comment_id": "",
             "existed_comment_text": "",
             "method_type": "POST",
@@ -235,25 +240,27 @@ def test_first_story_page_add_comment_logged_in_user_comment_text_wrong_type(cli
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
-def test_first_story_page_add_comment_logged_in_user_existed_comment_id_wrong_type(client):
+def test_first_story_page_add_comment_logged_in_user_existed_comment_id_wrong_type(
+    client,
+):
     """
     test adding a comment to the first story page
     by logged in user, wrong existed_comment_id type
     """
     first_story_id = get_first_top_story_data()[0]
-    resp_cook =  login(client)
-    access_token = resp_cook.headers[3][1].split(';')[0].split('=')[1]
-    client.set_cookie('localhost', 'access_token_cookie', access_token)
+    resp_cook = login(client)
+    access_token = resp_cook.headers[3][1].split(";")[0].split("=")[1]
+    client.set_cookie("localhost", "access_token_cookie", access_token)
     add_comment = client.post(
         f"/story/{first_story_id}",
         data={
             "by": "bob_2",
             "comment_deleted": False,
             "comment_text": "text from testing",
-            "existed_comment_id": [{'1':'2'}],
+            "existed_comment_id": [{"1": "2"}],
             "existed_comment_text": "",
             "method_type": "PUT",
         },
@@ -261,18 +268,20 @@ def test_first_story_page_add_comment_logged_in_user_existed_comment_id_wrong_ty
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
-def test_first_story_page_add_comment_logged_in_user_existed_comment_text_wrong_type(client):
+def test_first_story_page_add_comment_logged_in_user_existed_comment_text_wrong_type(
+    client,
+):
     """
     test adding a comment to the first story page
     by logged in user, wrong existed_comment_text type
     """
     first_story_id = get_first_top_story_data()[0]
-    resp_cook =  login(client)
-    access_token = resp_cook.headers[3][1].split(';')[0].split('=')[1]
-    client.set_cookie('localhost', 'access_token_cookie', access_token)
+    resp_cook = login(client)
+    access_token = resp_cook.headers[3][1].split(";")[0].split("=")[1]
+    client.set_cookie("localhost", "access_token_cookie", access_token)
     add_comment = client.post(
         f"/story/{first_story_id}",
         data={
@@ -287,7 +296,7 @@ def test_first_story_page_add_comment_logged_in_user_existed_comment_text_wrong_
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
 def test_first_story_page_add_comment_by_logout_user(client):
@@ -310,7 +319,7 @@ def test_first_story_page_add_comment_by_logout_user(client):
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
 def test_first_story_page_edit_comment_by_logout_user(client):
@@ -334,7 +343,7 @@ def test_first_story_page_edit_comment_by_logout_user(client):
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in edit_comment.data
+    assert b"Error 404 page not found" in edit_comment.data
 
 
 def test_first_story_page_delete_comment_by_logout_user(client):
@@ -358,7 +367,7 @@ def test_first_story_page_delete_comment_by_logout_user(client):
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in delete_comment.data
+    assert b"Error 404 page not found" in delete_comment.data
 
 
 def test_first_story_page_add_comment_deleted_wrong_type(client):
@@ -381,7 +390,7 @@ def test_first_story_page_add_comment_deleted_wrong_type(client):
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
 def test_first_story_page_add_comment_comment_text_wrong_type(client):
@@ -404,7 +413,8 @@ def test_first_story_page_add_comment_comment_text_wrong_type(client):
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
+
 
 def test_first_story_page_add_comment_existed_comment_id_wrong_type_logout_user(client):
     """
@@ -418,7 +428,7 @@ def test_first_story_page_add_comment_existed_comment_id_wrong_type_logout_user(
             "by": "bob_2",
             "comment_deleted": False,
             "comment_text": "the comment text",
-            "existed_comment_id": 'not a valid id',
+            "existed_comment_id": "not a valid id",
             "existed_comment_text": "",
             "method_type": "PUT",
         },
@@ -426,10 +436,12 @@ def test_first_story_page_add_comment_existed_comment_id_wrong_type_logout_user(
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
-def test_first_story_page_add_comment_existed_comment_text_wrong_type_logout_user(client):
+def test_first_story_page_add_comment_existed_comment_text_wrong_type_logout_user(
+    client,
+):
     """
     test adding a comment to the first story page
     by logout user, with existed_comment_text wrong type
@@ -442,14 +454,14 @@ def test_first_story_page_add_comment_existed_comment_text_wrong_type_logout_use
             "comment_deleted": False,
             "comment_text": "the comment text",
             "existed_comment_id": 123,
-            "existed_comment_text": [{"wrong":"type"}],
+            "existed_comment_text": [{"wrong": "type"}],
             "method_type": "PUT",
         },
         content_type="application/x-www-form-urlencoded",
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data
 
 
 def test_first_story_page_add_comment_method_type_wrong_type_logout_user(client):
@@ -465,11 +477,11 @@ def test_first_story_page_add_comment_method_type_wrong_type_logout_user(client)
             "comment_deleted": False,
             "comment_text": "the comment text",
             "existed_comment_id": 123,
-            "existed_comment_text": [{"wrong":"type"}],
+            "existed_comment_text": [{"wrong": "type"}],
             "method_type": [],
         },
         content_type="application/x-www-form-urlencoded",
         mimetype="application/x-www-form-urlencoded",
         follow_redirects=True,
     )
-    assert b'Error 404 page not found' in add_comment.data
+    assert b"Error 404 page not found" in add_comment.data

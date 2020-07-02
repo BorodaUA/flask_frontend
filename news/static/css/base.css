@@ -30,3 +30,11 @@ body{
 [id^="edit_comment_form"]{
     display: none;
 }
+
+#my_blog {
+    color: rgb(85, 145, 240);
+}
+
+#hacker_news{
+    color: rgb(219, 121, 41);
+}
