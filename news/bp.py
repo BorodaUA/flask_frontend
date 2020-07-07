@@ -33,7 +33,7 @@ def top_news_page(page_number):
     print(session)
     try:
         api_request = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/top_stories/{page_number}",
+            f"http://localhost:4000/api/hacker_news/top_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -64,7 +64,7 @@ def new_news_page(page_number):
     """
     try:
         api_request = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
+            f"http://back_1:4000/api/hacker_news/new_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -96,16 +96,16 @@ def story_page(story_id):
     comment_form = AddCommentForm()
     current_user = get_jwt_identity()
     api_request_top_stories = requests.post(
-        f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}",
+        f"http://back_1:4000/api/hacker_news/top_stories/story/{story_id}",
         json={"story_id": story_id},
     )
     api_request_new_stories = requests.post(
-        f"http://127.0.0.1:4000/api/hacker_news/new_stories/story/{story_id}",
+        f"http://back_1:4000/api/hacker_news/new_stories/story/{story_id}",
         json={"story_id": story_id},
     )
     if api_request_top_stories.status_code == 400:
         api_request_new_stories = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/new_stories/story/{story_id}",
+            f"http://back_1:4000/api/hacker_news/new_stories/story/{story_id}",
             json={"story_id": story_id},
         )
         if api_request_new_stories.status_code == 400:
@@ -138,21 +138,21 @@ def story_page(story_id):
         }
         if api_request_method == "POST":
             api_request_add_comment = requests.post(
-                f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
+                f"http://back_1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
                 json=api_request_data,
             )
             if api_request_add_comment.status_code == 400:
                 abort(404)
         elif api_request_method == "PUT":
             api_request_update_comment = requests.put(
-                f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
+                f"http://back_1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
                 json=api_request_data,
             )
             if api_request_update_comment.status_code == 400:
                 abort(404)
         elif api_request_method == "DELETE":
             api_request_delete_comment = requests.delete(
-                f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
+                f"http://back_1:4000/api/hacker_news/top_stories/story/{story_id}/comments",
                 json=api_request_data,
             )
             if api_request_delete_comment.status_code == 400:

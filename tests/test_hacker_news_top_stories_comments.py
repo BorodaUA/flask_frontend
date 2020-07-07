@@ -26,7 +26,7 @@ def get_first_top_story_data():
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/top_stories/{page_number}",
+            f"http://back_1:4000/api/hacker_news/top_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -42,7 +42,7 @@ def get_first_top_story_comments():
     first_story_id = get_first_top_story_data()[0]
     try:
         api_request = requests.get(
-            f"http://127.0.0.1:4000/api/hacker_news/top_stories/story/{first_story_id}/comments",
+            f"http://back_1:4000/api/hacker_news/top_stories/story/{first_story_id}/comments",
             json={"story_id": first_story_id},
         )
     except requests.exceptions.ConnectionError:

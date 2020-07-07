@@ -51,7 +51,7 @@ def signup_page():
                 "email_address": signup_form.email_address.data,
             }
             api_request = requests.post(
-                "http://127.0.0.1:4000/api/users/register", json=api_request_data
+                "http://back_1:4000/api/users/register", json=api_request_data
             )
             if api_request.status_code == 201:
                 api_response = api_request.json()
@@ -109,7 +109,7 @@ def signin_page():
             "password": signin_form.password.data,
         }
         api_request = requests.post(
-            "http://127.0.0.1:4000/api/users/signin", json=api_request_data
+            "http://back_1:4000/api/users/signin", json=api_request_data
         )
         if api_request.status_code == 200:
             api_response = api_request.json()

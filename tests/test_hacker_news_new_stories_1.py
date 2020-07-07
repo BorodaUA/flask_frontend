@@ -32,7 +32,7 @@ def test_news_page_last_pagination_page_hacker_news_new_stories(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
+            f"http://back_1:4000/api/hacker_news/new_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -51,7 +51,7 @@ def test_news_page_negative_pagination_hacker_news_new_stories(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
+            f"http://back_1:4000/api/hacker_news/new_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -70,7 +70,7 @@ def test_news_page_above_then_pagination_hacker_news_new_stories(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
+            f"http://back_1:4000/api/hacker_news/new_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -89,7 +89,7 @@ def test_valid_hacker_news_new_stories_page(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://127.0.0.1:4000/api/hacker_news/new_stories/{page_number}",
+            f"http://back_1:4000/api/hacker_news/new_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
