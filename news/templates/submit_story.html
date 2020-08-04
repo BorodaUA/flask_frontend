@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+<h1>ADD STORY PAGE</h1>
+<div id="submit_story">
+    <form class="submit_story_form" method="post" action="{{ url_for('news.submit_story_func')}}">
+      {{ form.csrf_token }}
+      <p>Story Title:</p>
+      {{ form.story_title(class_="form-control") }}
+      <br>
+      <p>Story Url:</p>
+      {{ form.story_url(class_="form-control") }}
+      <br>
+      <p>Story Text:</p>
+      {{ form.story_text(class_="form-control") }}
+      <br>
+      {% for key, value in form.errors.items() %}
+            {% for error_message in value %}
+                <li>{{ error_message }}</li>
+            {% endfor %}
+        {% endfor %}
+      <br>
+      <input class="btn btn-primary" type="submit" value="Submit Story">  
+    </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -19,8 +19,9 @@
   </head>
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-end">
-    <a class="navbar-brand" href="{{url_for('news.top_news_page_func', page_number=1)}}">Blog</a>
-    <a class="navbar-brand" href="{{url_for('news.new_news_page_func', page_number=1)}}">New</a>
+    <a class="navbar-brand" href="{{url_for('news.top_news_page_func', page_number=1)}}">Hacker_News</a>
+    <a class="navbar-brand" href="{{url_for('news.new_news_page_func', page_number=1)}}">Hacker_News New</a>
+    <a class="navbar-brand" href="{{url_for('news.blog_news_page_func', page_number=1)}}">Blog News</a>
     <a class="ml-auto mr-1"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
         <span class="navbar-toggler-icon"></span>
@@ -36,6 +37,9 @@
           </li>
           {% endif %}
           {% if user_uuid %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('news.submit_story_func')}}">Submit Story</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('users.user_profile_page_func', username=user_uuid)}}">User Profile</a>
           </li>

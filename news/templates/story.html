@@ -18,7 +18,7 @@
 <br>
 <!-- add comment form -->
 <div id="edit_comment">
-<form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.item_id)}}">
+<form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
   {{ form.csrf_token }}
   {{ form.method_type(value="POST") }}
   {{ form.comment_deleted}}
@@ -35,33 +35,33 @@
 <h1>Comments:</h1>
 {% for comment in story.comments%}
 
-  <div id="comment {{ comment.comment_id }}">
+  <div id="comment {{ comment.id }}">
     <div class="story">
         <div class="card">
             <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
             <div class="card-body">
-              <h5 id="comment_text {{ comment.comment_id }}" class="card-title">{{comment.text|safe}}</h5>
+              <h5 id="comment_text {{ comment.id }}" class="card-title">{{comment.text|safe}}</h5>
             </div>
           </div>
           {% if user_uuid == comment.by and user_origin == comment.origin %}
-          <button id="edit_comment_btn {{ comment.comment_id }}" onclick="showEditComment({{comment.comment_id}})" class="btn btn-primary">Edit</button>  
+          <button id="edit_comment_btn {{ comment.id }}" onclick="showEditComment({{comment.id}})" class="btn btn-primary">Edit</button>  
     </div>
     {% endif %}  
   </div>
       {% if user_uuid == comment.by %}
-  <div id="edit_comment_form {{ comment.comment_id }}">
-    <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.item_id)}}">
+  <div id="edit_comment_form {{ comment.id }}">
+    <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
       {{form.csrf_token}}
       {{ form.method_type }}
-      {{ form.comment_deleted(id="comment_deleted {}".format(comment.comment_id)) }}
-      {{ form.existed_comment_id(id="existed_comment_id {}".format(comment.comment_id)) }}
-      {{ form.existed_comment_text(id="existed_comment_text {}".format(comment.comment_id)) }}
+      {{ form.comment_deleted(id="comment_deleted {}".format(comment.id)) }}
+      {{ form.existed_comment_id(id="existed_comment_id {}".format(comment.id)) }}
+      {{ form.existed_comment_text(id="existed_comment_text {}".format(comment.id)) }}
       <p>Edit comment:</p>
       {{ form.comment_text(class_="form-control") }}
       <br>
       <input class="btn btn-primary" type="submit" value="Edit Comment">
-      <button id="delete_comment_btn {{ comment.comment_id }}" onclick="showEditComment({{comment.comment_id, comment.parent}})" class="btn btn-danger">Delete</button>
-      <button type="button" id="cancel_btn {{ comment.comment_id }}" onclick="hideEditComment({{comment.comment_id}})" class="btn btn-danger">Cancel</button>  
+      <button id="delete_comment_btn {{ comment.id }}" onclick="showEditComment({{comment.id, comment.parent}})" class="btn btn-danger">Delete</button>
+      <button type="button" id="cancel_btn {{ comment.id }}" onclick="hideEditComment({{comment.id}})" class="btn btn-danger">Cancel</button>  
     </form>
     
     </div>

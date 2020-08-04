@@ -7,7 +7,7 @@ import flask
 topdir = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(topdir)
 
-from flask_front_1 import create_app
+from flask_frontend import create_app
 
 # pytest -s -o log_cli=true -o log_level=INFO
 

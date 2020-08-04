@@ -1,12 +1,11 @@
-from flask_front_1 import create_app
-from flask_jwt_extended import JWTManager
+from flask_frontend import create_app
 
 app = create_app("development")
 
 
 if __name__ == "__main__":
     app.run(
-        host='0.0.0.0',
+        host="0.0.0.0",
         port=5000,
         debug=True,
         use_debugger=False,

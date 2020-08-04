@@ -5,7 +5,7 @@ __pycache__
 
 /errors/__pycache__
 
-/flask_front_1/__pycache__
+/flask_frontend/__pycache__
 /news/__pycache__
 /tests/__pycache__
 /tests/.pytest_cache

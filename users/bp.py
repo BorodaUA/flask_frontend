@@ -25,7 +25,20 @@ from flask_jwt_extended import (
     unset_access_cookies,
 )
 import datetime
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+
+BACKEND_SERVICE_NAME = os.environ.get("BACKEND_SERVICE_NAME")
+BACKEND_SERVICE_PORT = os.environ.get("BACKEND_SERVICE_PORT")
+
+USER_SIGNUP_URL = (
+    f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/users/register"
+)
+USER_SIGNIN_URL = (
+    f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/users/signin"
+)
 
 users_bp = Blueprint("users", __name__, template_folder="templates")
 
@@ -50,9 +63,7 @@ def signup_page():
                 "password": signup_form.password.data,
                 "email_address": signup_form.email_address.data,
             }
-            api_request = requests.post(
-                "http://back_1:4000/api/users/register", json=api_request_data
-            )
+            api_request = requests.post(USER_SIGNUP_URL, json=api_request_data)
             if api_request.status_code == 201:
                 api_response = api_request.json()
                 user = UserObject(
@@ -108,9 +119,7 @@ def signin_page():
             "email_address": signin_form.username.data,
             "password": signin_form.password.data,
         }
-        api_request = requests.post(
-            "http://back_1:4000/api/users/signin", json=api_request_data
-        )
+        api_request = requests.post(USER_SIGNIN_URL, json=api_request_data)
         if api_request.status_code == 200:
             api_response = api_request.json()
             user = UserObject(

@@ -16,6 +16,11 @@ python-dotenv = "*"
 coverage = "*"
 black = "*"
 lxml = "*"
+flake8 = "*"
+email-validator = "*"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

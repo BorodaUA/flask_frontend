@@ -1,11 +1,21 @@
 FROM python:3.8.3-alpine
-RUN mkdir /usr/src/front_1/
-WORKDIR /usr/src/front_1/
+#
+RUN mkdir /usr/src/flask_frontend/
+WORKDIR /usr/src/flask_frontend/
+#
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev && \ 
-    apk add libxml2-dev && apk add libxslt-dev && apk add python3-dev
-COPY . /usr/src/front_1/
+#
+RUN apk update
+RUN apk add --no-cache \
+    python3-dev \
+    postgresql-dev \
+    gcc \
+    musl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    git
+COPY . /usr/src/flask_frontend/
 RUN pip install -r requirements.txt
-CMD [ "python", "run.py" ]
+#
+ENTRYPOINT ["sh", "entrypoint.sh"]

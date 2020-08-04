@@ -8,7 +8,7 @@ import requests
 topdir = os.path.join(os.path.dirname(__file__), "..")
 sys.path.append(topdir)
 
-from flask_front_1 import create_app
+from flask_frontned import create_app
 
 # pytest -s -o log_cli=true -o log_level=INFO
 
@@ -32,7 +32,7 @@ def test_news_page_last_pagination_page_hacker_news_top_stories(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://back_1:4000/api/hacker_news/top_stories/{page_number}",
+            f"http://flask_backend:4000/api/hacker_news/top_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -48,7 +48,7 @@ def test_news_page_negative_pagination_hacker_news_top_stories(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://back_1:4000/api/hacker_news/top_stories/{page_number}",
+            f"http://flask_backend:4000/api/hacker_news/top_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -64,7 +64,7 @@ def test_news_page_above_then_pagination_hacker_news_top_stories(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://back_1:4000/api/hacker_news/top_stories/{page_number}",
+            f"http://flask_backend:4000/api/hacker_news/top_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
@@ -83,7 +83,7 @@ def test_valid_hacker_news_top_stories_page(client):
     page_number = 1
     try:
         api_request = requests.post(
-            f"http://back_1:4000/api/hacker_news/top_stories/{page_number}",
+            f"http://flask_backend:4000/api/hacker_news/top_stories/{page_number}",
             json={"page_number": page_number},
         )
     except requests.exceptions.ConnectionError:
