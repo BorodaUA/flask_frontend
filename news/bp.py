@@ -123,8 +123,11 @@ def story_page(story_id):
             abort(404)
         else:
             api_response = api_request_new_stories.json()
-    else:
+    elif api_request_top_stories.status_code == 200:
         api_response = api_request_top_stories.json()
+    elif api_request_new_stories.status_code == 200:
+        api_response = api_request_new_stories.json()
+    
     if request.method == "GET":
         resp = make_response(
             render_template("story.html", story=api_response, form=comment_form,)
