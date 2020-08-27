@@ -208,7 +208,7 @@ def submit_story():
         return resp
     ### POST ###
     if request.method == "POST" and submit_story_form.validate_on_submit():
-        HN_SUBMIT_TOP_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/submit"
+        BlogNewsStoryUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/"
         api_request_data = {
             #"parse_dt": datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")[:-3],
             #"hn_url": f'http://localhost:5000/story/',
@@ -224,16 +224,19 @@ def submit_story():
             "text": submit_story_form.story_text.data,
             # "time": int(time.time()),
             # "comment_type": "comment",
-            "origin": "my_blog",
+            # "origin": "my_blog",
         }
         api_request_submit_story = requests.post(
-            HN_SUBMIT_TOP_STORY, 
+            BlogNewsStoryUrl, 
             json=api_request_data
         )
         api_response = api_request_submit_story.json()
-        return api_response
-    resp = make_response(render_template("submit_story.html", form=submit_story_form,))
-    return resp
+        if api_request_submit_story.status_code == 201:
+            resp = make_response(redirect(url_for("news.blog_news_page_func",)))
+            return resp
+        else:
+            abort(404)
+
 
 @jwt_optional
 def blog_news_page(page_number):
@@ -269,7 +272,7 @@ def blog_news_page(page_number):
 
 
 news_bp.add_url_rule(
-    "/blog_news/<int:page_number>", "blog_news_page_func", blog_news_page, methods=["GET"]
+    "/blog_news/<int:page_number>", "blog_news_page_func", blog_news_page, methods=["GET"], defaults={"page_number": 1}
 )
 
 
