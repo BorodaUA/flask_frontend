@@ -241,12 +241,12 @@ def submit_story():
 @jwt_optional
 def blog_news_page(page_number):
     """
-    A view func for '/blog_news/<page_number>' endpoint
+    A view func for '/blognews/?pagenumber=n' endpoint
     """
     print(session)
-    BN_TOP_STORIES = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blog_news/{page_number}"
+    BlogNewsStoriesUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/?pagenumber={page_number}"
     try:
-        api_request = requests.get(BN_TOP_STORIES, json={"page_number": page_number},)
+        api_request = requests.get(BlogNewsStoriesUrl)
     except requests.exceptions.ConnectionError:
         api_request = None
         api_response = None
@@ -257,22 +257,25 @@ def blog_news_page(page_number):
             abort(404)
     else:
         abort(404)
-    resp = make_response(
-        render_template(
-            "news.html",
-            stories=api_response,
-            current_view_func="news.blog_news_page_func",
-            story_view_func="news.story_page_func",
+    if api_request.status_code == 200:
+        resp = make_response(
+            render_template(
+                "news.html",
+                stories=api_response,
+                current_view_func="news.blog_news_page_func",
+                story_view_func="news.story_page_func",
+            )
         )
-    )
-    return resp
+        return resp
+    else:
+        abort(404)
 
 
 
 
 
 news_bp.add_url_rule(
-    "/blog_news/<int:page_number>", "blog_news_page_func", blog_news_page, methods=["GET"], defaults={"page_number": 1}
+    "/blognews/<int:page_number>", "blog_news_page_func", blog_news_page, methods=["GET"], 
 )
 
 
