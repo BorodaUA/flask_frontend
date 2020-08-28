@@ -81,7 +81,7 @@ function showEditComment(comment_id, story_id) {
   var comment_form = document.getElementById("edit_comment_form "+comment_id);
   comment.style.display = "none";
   comment_form.style.display = "block";
-  comment_form.firstElementChild[1].value = "PUT"
+  comment_form.firstElementChild[1].value = "PATCH"
   comment_form.firstElementChild[3].value = comment_id;
   comment_form.firstElementChild[4].value = comment_text;
   comment_form.firstElementChild[5].value = comment_text;

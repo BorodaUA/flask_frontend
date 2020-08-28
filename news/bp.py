@@ -110,24 +110,25 @@ def story_page(story_id):
     ### GET ###
     HN_TOP_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/top_stories/stories/{story_id}"
     HN_NEW_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/new_stories/stories/{story_id}"
-    #BLOG_NEWS_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blog_news/stories/{story_id}"
+    BLOG_NEWS_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}"
     #
     api_request_top_stories = requests.get(HN_TOP_STORY, json={"story_id": story_id},)
     api_request_new_stories = requests.get(HN_NEW_STORY, json={"story_id": story_id},)
+    api_request_blog_stories = requests.get(BLOG_NEWS_STORY)
     #
-    if api_request_top_stories.status_code == 400:
-        api_request_new_stories = requests.get(
-            HN_NEW_STORY, json={"story_id": story_id},
-        )
-        if api_request_new_stories.status_code == 400:
-            abort(404)
-        else:
-            api_response = api_request_new_stories.json()
-    elif api_request_top_stories.status_code == 200:
+    if api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
+        abort(404)
+    elif api_request_top_stories.status_code == 200 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
         api_response = api_request_top_stories.json()
-    elif api_request_new_stories.status_code == 200:
+    elif api_request_new_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
         api_response = api_request_new_stories.json()
-    
+    elif api_request_blog_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400:
+        api_response = api_request_blog_stories.json()
+    elif api_request_top_stories.status_code == 200 or api_request_new_stories.status_code == 200 and api_request_blog_stories.status_code == 404:
+        if api_request_top_stories.status_code == 200:
+            api_response = api_request_top_stories.json()
+        elif api_request_new_stories.status_code == 200:
+            api_response = api_request_new_stories.json()
     if request.method == "GET":
         resp = make_response(
             render_template("story.html", story=api_response, form=comment_form,)
@@ -138,44 +139,88 @@ def story_page(story_id):
         #
         api_request_method = comment_form.method_type.data
         HN_TOP_STORY_COMMENTS = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/top_stories/stories/{story_id}/comments"
+        HN_NEW_STORY_COMMENTS = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/new_stories/stories/{story_id}/comments"
+        BlogNewsStoryCommentsUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}/comments"
         #
         api_request_data = {
-            "parsed_time": datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S.%f")[:-3],
             "by": current_user,
-            "deleted": comment_form.comment_deleted.data,
-            "existed_comment_id": comment_form.existed_comment_id.data,
-            "id": int(str(uuid1().int)[:8]),
-            "kids": [],
-            "parent": story_id,
-            "existed_comment_text": comment_form.existed_comment_text.data,
             "text": comment_form.comment_text.data,
-            "time": int(time.time()),
-            "type": "comment",
-            "origin": "my_blog",
         }
         #
         if api_request_method == "POST":
-            api_request_add_comment = requests.post(
-                HN_TOP_STORY_COMMENTS, json=api_request_data,
-            )
-            if api_request_add_comment.status_code == 400:
+            if api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
                 abort(404)
-        elif api_request_method == "PUT":
-            api_request_update_comment = requests.put(
+            elif api_request_top_stories.status_code == 200 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
+                api_request_hn_top_story_comment = requests.post(
                 HN_TOP_STORY_COMMENTS, json=api_request_data,
-            )
-            if api_request_update_comment.status_code == 400:
+                )
+            elif api_request_new_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
+                api_request_hn_new_story_comment = requests.post(
+                HN_NEW_STORY_COMMENTS, json=api_request_data,
+                )
+            elif api_request_blog_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400:
+                api_request_blognews_story_comment = requests.post(
+                BlogNewsStoryCommentsUrl, json=api_request_data,
+                )
+            elif api_request_top_stories.status_code == 200 or api_request_new_stories.status_code == 200 and api_request_blog_stories.status_code == 404:
+                if api_request_top_stories.status_code == 200:
+                    api_request_hn_top_story_comment = requests.post(
+                    HN_TOP_STORY_COMMENTS, json=api_request_data,
+                    )
+                elif api_request_new_stories.status_code == 200:
+                    api_request_hn_new_story_comment = requests.post(
+                    HN_NEW_STORY_COMMENTS, json=api_request_data,
+                    )
+        elif api_request_method == "PATCH":
+            BlogNewsStoryCommentsUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}/comments/{comment_form.existed_comment_id.data}"
+            if api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
                 abort(404)
+            elif api_request_top_stories.status_code == 200 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
+                api_request_hn_top_story_comment = requests.patch(
+                HN_TOP_STORY_COMMENTS, json=api_request_data,
+                )
+            elif api_request_new_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
+                api_request_hn_new_story_comment = requests.patch(
+                HN_NEW_STORY_COMMENTS, json=api_request_data,
+                )
+            elif api_request_blog_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400:
+                api_request_blognews_story_comment = requests.patch(
+                BlogNewsStoryCommentsUrl, json=api_request_data,
+                )
+            elif api_request_top_stories.status_code == 200 or api_request_new_stories.status_code == 200 and api_request_blog_stories.status_code == 404:
+                if api_request_top_stories.status_code == 200:
+                    api_request_hn_top_story_comment = requests.patch(
+                    HN_TOP_STORY_COMMENTS, json=api_request_data,
+                    )
+                elif api_request_new_stories.status_code == 200:
+                    api_request_hn_new_story_comment = requests.patch(
+                    HN_NEW_STORY_COMMENTS, json=api_request_data,
+                    )
         elif api_request_method == "DELETE":
-            api_request_delete_comment = requests.delete(
-                HN_TOP_STORY_COMMENTS, json=api_request_data,
-            )
-            if api_request_delete_comment.status_code == 400:
+            BlogNewsStoryCommentsUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}/comments/{comment_form.existed_comment_id.data}"
+            if api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
                 abort(404)
-        else:
-            abort(404)
-    else:
-        abort(404)
+            elif api_request_top_stories.status_code == 200 and api_request_new_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
+                api_request_hn_top_story_comment = requests.delete(
+                HN_TOP_STORY_COMMENTS, json=api_request_data,
+                )
+            elif api_request_new_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_blog_stories.status_code == 404:
+                api_request_hn_new_story_comment = requests.delete(
+                HN_NEW_STORY_COMMENTS, json=api_request_data,
+                )
+            elif api_request_blog_stories.status_code == 200 and api_request_top_stories.status_code == 400 and api_request_new_stories.status_code == 400:
+                api_request_blognews_story_comment = requests.delete(
+                BlogNewsStoryCommentsUrl, json=api_request_data,
+                )
+            elif api_request_top_stories.status_code == 200 or api_request_new_stories.status_code == 200 and api_request_blog_stories.status_code == 404:
+                if api_request_top_stories.status_code == 200:
+                    api_request_hn_top_story_comment = requests.delete(
+                    HN_TOP_STORY_COMMENTS, json=api_request_data,
+                    )
+                elif api_request_new_stories.status_code == 200:
+                    api_request_hn_new_story_comment = requests.delete(
+                    HN_NEW_STORY_COMMENTS, json=api_request_data,
+                    )
     resp = make_response(
         redirect(url_for("news.story_page_func", story_id=story_id), 302)
     )
@@ -232,14 +277,14 @@ def submit_story():
         )
         api_response = api_request_submit_story.json()
         if api_request_submit_story.status_code == 201:
-            resp = make_response(redirect(url_for("news.blog_news_page_func",)))
+            resp = make_response(redirect(url_for("news.blog_news_page_func", page_number=1)))
             return resp
         else:
             abort(404)
 
 
 @jwt_optional
-def blog_news_page(page_number):
+def blog_news_page(page_number:1):
     """
     A view func for '/blognews/?pagenumber=n' endpoint
     """
