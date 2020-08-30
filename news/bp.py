@@ -14,6 +14,7 @@ from uuid import uuid4, uuid1
 import requests
 from news.libs.add_comment_form import AddCommentForm
 from news.libs.submit_story_form import SubmitStoryForm
+from news.libs.edit_story_form import EditStoryForm
 from datetime import datetime
 import time
 import os
@@ -106,6 +107,7 @@ def story_page(story_id):
     """
     #
     comment_form = AddCommentForm()
+    edit_story_form = EditStoryForm()
     current_user = get_jwt_identity()
     ### GET ###
     HN_TOP_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/top_stories/stories/{story_id}"
@@ -131,10 +133,33 @@ def story_page(story_id):
             api_response = api_request_new_stories.json()
     if request.method == "GET":
         resp = make_response(
-            render_template("story.html", story=api_response, form=comment_form,)
+            render_template("story.html", story=api_response, form=comment_form, edit_story_form=edit_story_form)
         )
         return resp
     ### POST ###
+    # Story form Patch, Delete
+    if request.method == "POST" and edit_story_form.validate_on_submit():
+        form_request_method = edit_story_form.method_type.data
+        BlogNewsStoryUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}"
+        api_story_request_data = {
+            "title": edit_story_form.story_title.data,
+            "url": edit_story_form.story_url.data,
+            "text": edit_story_form.story_text.data
+        }
+        if form_request_method == "PATCH":
+            api_request_blognews_story = requests.patch(
+                BlogNewsStoryUrl, json=api_story_request_data,
+            )
+        if form_request_method == "DELETE":
+            api_request_blognews_story = requests.delete(
+                BlogNewsStoryUrl, json=api_story_request_data,
+            )
+            if api_request_blognews_story.status_code == 200:
+                resp = make_response(redirect(url_for('news.blog_news_page_func', page_number=1)))
+                return resp
+            else:
+                abort(404)
+    # Comment form Post, Patch, Delete
     if request.method == "POST" and comment_form.validate_on_submit():
         #
         api_request_method = comment_form.method_type.data

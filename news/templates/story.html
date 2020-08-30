@@ -3,17 +3,51 @@
 <div class="container">
     <br>
     <h1>Story page</h1>
-<div class="story">
+<div id="story {{story.id}}">
     <div class="card">
-        <a class="title_url" href="#"><h5 class="card-header">{{story.title}}</h5></a>
+        <a class="title_url" href="#"><h5 class="card-header" id="story_title {{story.id}}">{{story.title}}</h5></a>
         <div class="card-body">
-          <h5 class="card-title">{{story.by}}</h5>
-          <a href={{story.hn_url}}><p class="card-text">{{story.hn_url}}</p></a>
-          <a href="{{story.url}}" class="btn btn-primary">Story url</a>
-          <a href="#" class="btn btn-primary">{{story.score}}</a>
+          <h5 class="card-title" id="story_text {{story.id}}">{{story.text}}</h5>
+          <h5 class="card-title" id="story_by {{story.id}}">{{story.by}}</h5>
+          <a href="{{story.url}}" class="btn btn-primary" id="story_url {{story.id}}">Story url</a>
+          <a href="#" class="btn btn-primary" id="story_score {{story.id}}">{{story.score}}</a>
         </div>
       </div>
-</div>
+  {% if user_uuid == story.by and user_origin == story.origin %}
+  <br>
+  <div id="edit_story_btn {{story.id}}">
+      <button id="edit_story_btn {{ story.id }}" onclick="showEditStory({{story.id}});" class="btn btn-primary">Edit</button>
+  </div> 
+  {% endif %} 
+  </div>
+  {% if user_uuid == story.by and user_origin == story.origin %}
+      <div id="edit_story_form {{ story.id }}">
+        <form class="story_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
+          {{ edit_story_form.csrf_token }}
+          {{ edit_story_form.method_type }}
+          <p>Story Title:</p>
+          {{ edit_story_form.story_title(class_="form-control") }}
+          <br>
+          <p>Story Url:</p>
+          {{ edit_story_form.story_url(class_="form-control") }}
+          <br>
+          <p>Story Text:</p>
+          {{ edit_story_form.story_text(class_="form-control") }}
+          <br>
+          {% for key, value in edit_story_form.errors.items() %}
+                {% for error_message in value %}
+                    <li>{{ error_message }}</li>
+                {% endfor %}
+            {% endfor %}
+          <br>
+          <input class="btn btn-primary" type="submit" value="Edit story"> 
+          <button id="delete_story_btn {{ story.id }}" onclick="showEditStory({{story.id}});" class="btn btn-danger">Delete story</button>
+          <button type="button" id="cancel_story_btn {{ story.id }}" onclick="hideEditStory({{story.id}})" class="btn btn-danger">Cancel</button>  
+
+        </form>
+
+      </div>
+  {% endif %}
 {% if user_uuid %}
 <br>
 <!-- add comment form -->
@@ -36,7 +70,7 @@
 {% for comment in story.comments%}
 
   <div id="comment {{ comment.id }}">
-    <div class="story">
+    <div class="comment {{comment.id}}">
         <div class="card">
             <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
             <div class="card-body">
@@ -60,8 +94,8 @@
       {{ form.comment_text(class_="form-control") }}
       <br>
       <input class="btn btn-primary" type="submit" value="Edit Comment">
-      <button id="delete_comment_btn {{ comment.id }}" onclick="showEditComment({{comment.id, comment.parent}})" class="btn btn-danger">Delete</button>
-      <button type="button" id="cancel_btn {{ comment.id }}" onclick="hideEditComment({{comment.id}})" class="btn btn-danger">Cancel</button>  
+      <button id="delete_comment_btn {{ comment.id }}" onclick="showEditComment({{comment.id, comment.parent}});" class="btn btn-danger">Delete</button>
+      <button type="button" id="cancel_btn {{ comment.id }}" onclick="hideEditComment({{comment.id}});" class="btn btn-danger">Cancel</button>  
     </form>
     
     </div>
@@ -74,32 +108,78 @@
 function showEditComment(comment_id, story_id) {
   var edit_btn = document.getElementById("edit_comment_btn "+comment_id);
   var cancel_btn = document.getElementById("cancel_btn "+comment_id);
+  // 
   var existed_comment_id = document.getElementById("existed_comment_id "+comment_id);
   var comment = document.getElementById("comment "+comment_id);
+  // 
   var delete_btn = document.getElementById("delete_comment_btn "+comment_id);
   var comment_text = document.getElementById("comment_text "+comment_id).innerHTML;
   var comment_form = document.getElementById("edit_comment_form "+comment_id);
   comment.style.display = "none";
   comment_form.style.display = "block";
+  // 
   comment_form.firstElementChild[1].value = "PATCH"
   comment_form.firstElementChild[3].value = comment_id;
   comment_form.firstElementChild[4].value = comment_text;
   comment_form.firstElementChild[5].value = comment_text;
   comment_form.firstElementChild[5].focus();
+  // 
   delete_btn.onclick = function(){
     comment_form.firstElementChild[1].value = "DELETE"
     comment_form.firstElementChild[2].value = true
-  }
+  };
 
-}
+};
 function hideEditComment(comment_id) {
   var edit_btn = document.getElementById("edit_comment_btn "+comment_id);
   var cancel_btn = document.getElementById("cancel_btn "+comment_id);
-  
+  // 
   var comment = document.getElementById("comment "+comment_id);
   var comment_form = document.getElementById("edit_comment_form "+comment_id);
+  // 
   comment.style.display = "block";
   comment_form.style.display = "none";
-}
+};
+</script>
+<script>
+  function showEditStory(story_id){
+    var story = document.getElementById("story "+ story_id);
+    var edit_story_form = document.getElementById("edit_story_form "+ story_id);
+    var delete_story_btn = document.getElementById("delete_story_btn "+story_id);
+    // 
+    var story_title = document.getElementById("story_title "+ story_id).innerText
+    var story_text = document.getElementById("story_text "+ story_id).innerText
+    var story_url = document.getElementById("story_url "+ story_id).getAttribute('href')
+    var story_score = document.getElementById("story_score "+ story_id).innerText
+    // 
+    var form_story_title_input = document.getElementById('story_title')
+    var form_story_url_input = document.getElementById('story_url')
+    var form_story_text_input = document.getElementById('story_text')
+    var form_method_type = document.getElementById("method_type")
+    // 
+    form_story_title_input.value = story_title 
+    form_story_url_input.value = story_url
+    form_story_text_input.value = story_text
+    // 
+    delete_story_btn.onclick = function(){
+      delete_alert = confirm("Do you want to delete story?")
+      if (delete_alert == true) {
+        form_method_type.value = "DELETE"
+      }
+      else {
+        return false
+      }
+    }
+    // 
+    story.style.display = "none";
+    edit_story_form.style.display = "block";
+
+  };
+  function hideEditStory(story_id) {
+    var story = document.getElementById("story "+ story_id);
+    var edit_story_form = document.getElementById("edit_story_form "+ story_id)
+    edit_story_form.style.display = "none";
+    story.style.display = "block";
+  };
 </script>
 {% endblock %}
