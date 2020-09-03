@@ -32,9 +32,15 @@ def top_news_page(page_number):
     A view func for '/' endpoint, aftef first page for /news/<page_number>
     """
     print(session)
-    HN_TOP_STORIES = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/top_stories/{page_number}"
+    HN_TOP_STORIES = (
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
+        f"hacker_news/top_stories/{page_number}"
+        )
     try:
-        api_request = requests.get(HN_TOP_STORIES, json={"page_number": page_number},)
+        api_request = requests.get(
+            HN_TOP_STORIES,
+            json={"page_number": page_number}
+            )
     except requests.exceptions.ConnectionError:
         api_request = None
         api_response = None
@@ -59,11 +65,18 @@ def top_news_page(page_number):
 @jwt_optional
 def new_news_page(page_number):
     """
-    A view func for '/newest' endpoint, aftef first page for /newest/<page_number>
+    A view func for '/newest' endpoint, after
+    first page for /newest/<page_number>
     """
-    HN_NEW_STORIES = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/new_stories/{page_number}"
+    HN_NEW_STORIES = (
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+        f"/api/hacker_news/new_stories/{page_number}"
+    )
     try:
-        api_request = requests.get(HN_NEW_STORIES, json={"page_number": page_number},)
+        api_request = requests.get(
+            HN_NEW_STORIES,
+            json={"page_number": page_number},
+            )
     except requests.exceptions.ConnectionError:
         api_request = None
         api_response = None

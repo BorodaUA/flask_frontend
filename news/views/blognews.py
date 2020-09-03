@@ -9,9 +9,9 @@ from flask import (
 )
 from flask_jwt_extended import jwt_optional, get_jwt_identity, jwt_required
 import requests
-from news.libs.add_comment_form import AddCommentForm
-from news.libs.submit_story_form import SubmitStoryForm
-from news.libs.edit_story_form import EditStoryForm
+from news.libs.comment_form import AddCommentForm
+# from news.libs.submit_story_form import SubmitStoryForm
+from news.libs.story_form import StoryForm
 import os
 from dotenv import load_dotenv
 
@@ -23,7 +23,7 @@ BACKEND_SERVICE_PORT = os.environ.get("BACKEND_SERVICE_PORT")
 
 @jwt_required
 def submit_story():
-    submit_story_form = SubmitStoryForm()
+    submit_story_form = StoryForm()
     current_user = get_jwt_identity()
     # GET
     if request.method == "GET":
@@ -34,7 +34,8 @@ def submit_story():
     # POST
     if request.method == "POST" and submit_story_form.validate_on_submit():
         BlogNewsStoryUrl = (
-            f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/"
+            f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+            f"/api/blognews/"
         )
         api_request_data = {
 
@@ -61,7 +62,10 @@ def blog_news_page(page_number: 1):
     A view func for '/blognews/?pagenumber=n' endpoint
     """
     print(session)
-    BlogNewsStoriesUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/?pagenumber={page_number}"
+    BlogNewsStoriesUrl = (
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+        f"/api/blognews/?pagenumber={page_number}"
+        )
     try:
         api_request = requests.get(BlogNewsStoriesUrl)
     except requests.exceptions.ConnectionError:
@@ -95,17 +99,30 @@ def story_page(story_id):
     """
     #
     comment_form = AddCommentForm()
-    edit_story_form = EditStoryForm()
+    edit_story_form = StoryForm()
     current_user = get_jwt_identity()
     # GET
-    HN_TOP_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/top_stories/stories/{story_id}"
-    HN_NEW_STORY = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/new_stories/stories/{story_id}"
+    HN_TOP_STORY = (
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+        f"/api/hacker_news/top_stories/stories/{story_id}"
+    )
+    HN_NEW_STORY = (
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+        f"/api/hacker_news/new_stories/stories/{story_id}"
+    )
     BLOG_NEWS_STORY = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}"
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+        f"/api/blognews/{story_id}"
     )
     #
-    api_request_top_stories = requests.get(HN_TOP_STORY, json={"story_id": story_id},)
-    api_request_new_stories = requests.get(HN_NEW_STORY, json={"story_id": story_id},)
+    api_request_top_stories = requests.get(
+        HN_TOP_STORY,
+        json={"story_id": story_id},
+        )
+    api_request_new_stories = requests.get(
+        HN_NEW_STORY,
+        json={"story_id": story_id},
+        )
     api_request_blog_stories = requests.get(BLOG_NEWS_STORY)
     #
     if (
@@ -155,7 +172,10 @@ def story_page(story_id):
     # Story form Patch, Delete
     if request.method == "POST" and edit_story_form.validate_on_submit():
         form_request_method = edit_story_form.method_type.data
-        BlogNewsStoryUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}"
+        BlogNewsStoryUrl = (
+            f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+            f"/api/blognews/{story_id}"
+        )
         api_story_request_data = {
             "title": edit_story_form.story_title.data,
             "url": edit_story_form.story_url.data,
@@ -171,7 +191,10 @@ def story_page(story_id):
             )
             if api_request_blognews_story.status_code == 200:
                 resp = make_response(
-                    redirect(url_for("news.blog_news_page_func", page_number=1))
+                    redirect(url_for(
+                        "news.blog_news_page_func",
+                        page_number=1)
+                    )
                 )
                 return resp
             else:
@@ -180,9 +203,18 @@ def story_page(story_id):
     if request.method == "POST" and comment_form.validate_on_submit():
         #
         api_request_method = comment_form.method_type.data
-        HN_TOP_STORY_COMMENTS = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/top_stories/stories/{story_id}/comments"
-        HN_NEW_STORY_COMMENTS = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/hacker_news/new_stories/stories/{story_id}/comments"
-        BlogNewsStoryCommentsUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}/comments"
+        HN_TOP_STORY_COMMENTS = (
+            f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+            f"/api/hacker_news/top_stories/stories/{story_id}/comments"
+        )
+        HN_NEW_STORY_COMMENTS = (
+            f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+            f"/api/hacker_news/new_stories/stories/{story_id}/comments"
+        )
+        BlogNewsStoryCommentsUrl = (
+            f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+            f"/api/blognews/{story_id}/comments"
+        )
         #
         api_request_data = {
             "by": current_user,
@@ -201,7 +233,7 @@ def story_page(story_id):
                 and api_request_new_stories.status_code == 400
                 and api_request_blog_stories.status_code == 404
             ):
-                api_request_hn_top_story_comment = requests.post(
+                requests.post(
                     HN_TOP_STORY_COMMENTS, json=api_request_data,
                 )
             elif (
@@ -209,7 +241,7 @@ def story_page(story_id):
                 and api_request_top_stories.status_code == 400
                 and api_request_blog_stories.status_code == 404
             ):
-                api_request_hn_new_story_comment = requests.post(
+                requests.post(
                     HN_NEW_STORY_COMMENTS, json=api_request_data,
                 )
             elif (
@@ -217,7 +249,7 @@ def story_page(story_id):
                 and api_request_top_stories.status_code == 400
                 and api_request_new_stories.status_code == 400
             ):
-                api_request_blognews_story_comment = requests.post(
+                requests.post(
                     BlogNewsStoryCommentsUrl, json=api_request_data,
                 )
             elif (
@@ -226,15 +258,19 @@ def story_page(story_id):
                 and api_request_blog_stories.status_code == 404
             ):
                 if api_request_top_stories.status_code == 200:
-                    api_request_hn_top_story_comment = requests.post(
+                    requests.post(
                         HN_TOP_STORY_COMMENTS, json=api_request_data,
                     )
                 elif api_request_new_stories.status_code == 200:
-                    api_request_hn_new_story_comment = requests.post(
+                    requests.post(
                         HN_NEW_STORY_COMMENTS, json=api_request_data,
                     )
         elif api_request_method == "PATCH":
-            BlogNewsStoryCommentsUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}/comments/{comment_form.existed_comment_id.data}"
+            BlogNewsStoryCommentsUrl = (
+                f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+                f"/api/blognews/{story_id}"
+                f"/comments/{comment_form.comment_id.data}"
+            )
             if (
                 api_request_top_stories.status_code == 400
                 and api_request_new_stories.status_code == 400
@@ -246,7 +282,7 @@ def story_page(story_id):
                 and api_request_new_stories.status_code == 400
                 and api_request_blog_stories.status_code == 404
             ):
-                api_request_hn_top_story_comment = requests.patch(
+                requests.patch(
                     HN_TOP_STORY_COMMENTS, json=api_request_data,
                 )
             elif (
@@ -254,7 +290,7 @@ def story_page(story_id):
                 and api_request_top_stories.status_code == 400
                 and api_request_blog_stories.status_code == 404
             ):
-                api_request_hn_new_story_comment = requests.patch(
+                requests.patch(
                     HN_NEW_STORY_COMMENTS, json=api_request_data,
                 )
             elif (
@@ -262,7 +298,7 @@ def story_page(story_id):
                 and api_request_top_stories.status_code == 400
                 and api_request_new_stories.status_code == 400
             ):
-                api_request_blognews_story_comment = requests.patch(
+                requests.patch(
                     BlogNewsStoryCommentsUrl, json=api_request_data,
                 )
             elif (
@@ -271,15 +307,19 @@ def story_page(story_id):
                 and api_request_blog_stories.status_code == 404
             ):
                 if api_request_top_stories.status_code == 200:
-                    api_request_hn_top_story_comment = requests.patch(
+                    requests.patch(
                         HN_TOP_STORY_COMMENTS, json=api_request_data,
                     )
                 elif api_request_new_stories.status_code == 200:
-                    api_request_hn_new_story_comment = requests.patch(
+                    requests.patch(
                         HN_NEW_STORY_COMMENTS, json=api_request_data,
                     )
         elif api_request_method == "DELETE":
-            BlogNewsStoryCommentsUrl = f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/blognews/{story_id}/comments/{comment_form.existed_comment_id.data}"
+            BlogNewsStoryCommentsUrl = (
+                f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+                f"/api/blognews/{story_id}"
+                f"/comments/{comment_form.comment_id.data}"
+            )
             if (
                 api_request_top_stories.status_code == 400
                 and api_request_new_stories.status_code == 400
@@ -291,7 +331,7 @@ def story_page(story_id):
                 and api_request_new_stories.status_code == 400
                 and api_request_blog_stories.status_code == 404
             ):
-                api_request_hn_top_story_comment = requests.delete(
+                requests.delete(
                     HN_TOP_STORY_COMMENTS, json=api_request_data,
                 )
             elif (
@@ -299,7 +339,7 @@ def story_page(story_id):
                 and api_request_top_stories.status_code == 400
                 and api_request_blog_stories.status_code == 404
             ):
-                api_request_hn_new_story_comment = requests.delete(
+                requests.delete(
                     HN_NEW_STORY_COMMENTS, json=api_request_data,
                 )
             elif (
@@ -307,7 +347,7 @@ def story_page(story_id):
                 and api_request_top_stories.status_code == 400
                 and api_request_new_stories.status_code == 400
             ):
-                api_request_blognews_story_comment = requests.delete(
+                requests.delete(
                     BlogNewsStoryCommentsUrl, json=api_request_data,
                 )
             elif (
@@ -316,11 +356,11 @@ def story_page(story_id):
                 and api_request_blog_stories.status_code == 404
             ):
                 if api_request_top_stories.status_code == 200:
-                    api_request_hn_top_story_comment = requests.delete(
+                    requests.delete(
                         HN_TOP_STORY_COMMENTS, json=api_request_data,
                     )
                 elif api_request_new_stories.status_code == 200:
-                    api_request_hn_new_story_comment = requests.delete(
+                    requests.delete(
                         HN_NEW_STORY_COMMENTS, json=api_request_data,
                     )
     resp = make_response(
