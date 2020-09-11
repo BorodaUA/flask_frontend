@@ -6,8 +6,9 @@ from flask import (
 from uuid import uuid4
 import os
 from dotenv import load_dotenv
-from news.views.blognews import story_page, submit_story, blog_news_page
+from news.views.blognews import submit_story, blog_news_page
 from news.views.hackernews import new_news_page, top_news_page
+from news.views.story import story_page
 
 load_dotenv()
 
