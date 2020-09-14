@@ -67,13 +67,12 @@ def new_news_page(page_number):
     """
     HN_NEW_STORIES = (
         f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
-        f"/api/hacker_news/new_stories/{page_number}"
+        f"/api/hackernews/newstories/?pagenumber={page_number}"
     )
     try:
         api_request = requests.get(
             HN_NEW_STORIES,
-            json={"page_number": page_number},
-            )
+        )
     except requests.exceptions.ConnectionError:
         api_request = None
         api_response = None
