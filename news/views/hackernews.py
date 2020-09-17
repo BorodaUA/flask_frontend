@@ -50,7 +50,7 @@ def top_news_page(page_number):
         abort(404)
     resp = make_response(
         render_template(
-            "news.html",
+            "hn_topstories.html",
             stories=api_response,
             current_view_func="news.top_news_page_func",
             story_view_func="news.story_page_func",
@@ -85,7 +85,7 @@ def new_news_page(page_number):
         abort(404)
     resp = make_response(
         render_template(
-            "news.html",
+            "hn_newstories.html",
             stories=api_response,
             current_view_func="news.new_news_page_func",
             story_view_func="news.story_page_func",
