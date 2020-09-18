@@ -53,49 +53,95 @@ def story_page(story_id):
         )
     api_request_blog_stories = requests.get(BLOG_NEWS_STORY)
     #
-    if (
-        api_request_top_stories.status_code == 404
-        and api_request_new_stories.status_code == 404
-        and api_request_blog_stories.status_code == 404
-    ):
-        abort(404)
-    elif (
-        api_request_top_stories.status_code == 200
-        and api_request_new_stories.status_code == 404
-        and api_request_blog_stories.status_code == 404
-    ):
-        api_response = api_request_top_stories.json()
-    elif (
-        api_request_new_stories.status_code == 200
-        and api_request_top_stories.status_code == 404
-        and api_request_blog_stories.status_code == 404
-    ):
-        api_response = api_request_new_stories.json()
-    elif (
-        api_request_blog_stories.status_code == 200
-        and api_request_top_stories.status_code == 404
-        and api_request_new_stories.status_code == 404
-    ):
-        api_response = api_request_blog_stories.json()
-    elif (
-        api_request_top_stories.status_code == 200
-        or api_request_new_stories.status_code == 200
-        and api_request_blog_stories.status_code == 404
-    ):
-        if api_request_top_stories.status_code == 200:
-            api_response = api_request_top_stories.json()
-        elif api_request_new_stories.status_code == 200:
-            api_response = api_request_new_stories.json()
     if request.method == "GET":
-        resp = make_response(
-            render_template(
-                "story.html",
-                story=api_response,
-                form=comment_form,
-                edit_story_form=edit_story_form,
+        if (
+            api_request_top_stories.status_code == 404
+            and api_request_new_stories.status_code == 404
+            and api_request_blog_stories.status_code == 404
+        ):
+            abort(404)
+        elif (
+            api_request_top_stories.status_code == 200
+            and api_request_new_stories.status_code == 404
+            and api_request_blog_stories.status_code == 404
+        ):
+            api_response = api_request_top_stories.json()
+            resp = make_response(
+                render_template(
+                    template_name_or_list="hn_topstory.html",
+                    story=api_response,
+                    form=comment_form,
+                    edit_story_form=edit_story_form,
+                )
             )
-        )
-        return resp
+            return resp
+        elif (
+            api_request_new_stories.status_code == 200
+            and api_request_top_stories.status_code == 404
+            and api_request_blog_stories.status_code == 404
+        ):
+            api_response = api_request_new_stories.json()
+            resp = make_response(
+                render_template(
+                    template_name_or_list="hn_newstory.html",
+                    story=api_response,
+                    form=comment_form,
+                    edit_story_form=edit_story_form,
+                )
+            )
+            return resp
+        elif (
+            api_request_blog_stories.status_code == 200
+            and api_request_top_stories.status_code == 404
+            and api_request_new_stories.status_code == 404
+        ):
+            api_response = api_request_blog_stories.json()
+            resp = make_response(
+                render_template(
+                    template_name_or_list="blognews_story.html",
+                    story=api_response,
+                    form=comment_form,
+                    edit_story_form=edit_story_form,
+                )
+            )
+            return resp
+        elif (
+            api_request_top_stories.status_code == 200
+            or api_request_new_stories.status_code == 200
+            and api_request_blog_stories.status_code == 404
+        ):
+            if api_request_top_stories.status_code == 200:
+                api_response = api_request_top_stories.json()
+                resp = make_response(
+                    render_template(
+                        "hn_topstory.html",
+                        story=api_response,
+                        form=comment_form,
+                        edit_story_form=edit_story_form,
+                    )
+                )
+                return resp
+            elif api_request_new_stories.status_code == 200:
+                api_response = api_request_new_stories.json()
+                resp = make_response(
+                    render_template(
+                        template_name_or_list="hn_newstory.html",
+                        story=api_response,
+                        form=comment_form,
+                        edit_story_form=edit_story_form,
+                    )
+                )
+                return resp
+    # if request.method == "GET":
+        # resp = make_response(
+        #     render_template(
+        #         "story.html",
+        #         story=api_response,
+        #         form=comment_form,
+        #         edit_story_form=edit_story_form,
+        #     )
+        # )
+        # return resp
     # POST
     # Story form Patch, Delete
     if request.method == "POST" and edit_story_form.validate_on_submit():

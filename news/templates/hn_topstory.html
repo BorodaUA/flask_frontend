@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="container" class="container">
+<br>
+<h1>Story page</h1>
+<div id="story {{story.hn_id}}" data-story_id="{{ story.hn_id }}">
+  <div class="card">
+    <a class="title_url" href="#"><h5 class="card-header" id="story_title {{story.hn_id}}">{{story.title}}</h5></a>
+    <div class="card-body">
+      <h5 class="card-title" id="story_text {{story.hn_id}}">{{story.text}}</h5>
+      <h5 class="card-title" id="story_by {{story.hn_id}}">{{story.by}}</h5>
+      <a href="{{story.url}}" class="btn btn-primary" id="story_url {{story.hn_id}}">Story url</a>
+      <a href="#" class="btn btn-primary" id="story_score {{story.hn_id}}">{{story.score}}</a>
+    </div>
+</div>
+{% if user_uuid == story.by and user_origin == story.origin %}
+<br>
+<div id="edit_story_btn {{story.hn_id}}">
+  <button id="edit_story_btn" data-edit_story_btn="{{story.hn_id}}" onclick="editStoryBtn();" class="btn btn-primary">Edit</button>
+</div> 
+{% endif %} 
+</div>
+{% if user_uuid == story.by and user_origin == story.origin %}
+<div id="edit_story_form {{ story.hn_id }}">
+  <form class="story_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
+    {{ edit_story_form.csrf_token }}
+    {{ edit_story_form.method_type }}
+    <p>Story Title:</p>
+    {{ edit_story_form.story_title(class_="form-control") }}
+    <br>
+    <p>Story Url:</p>
+    {{ edit_story_form.story_url(class_="form-control") }}
+    <br>
+    <p>Story Text:</p>
+    {{ edit_story_form.story_text(class_="form-control") }}
+    <br>
+    {% for key, value in edit_story_form.errors.items() %}
+      {% for error_message in value %}
+          <li>{{ error_message }}</li>
+      {% endfor %}
+    {% endfor %}
+    <br>
+    <input class="btn btn-primary" type="submit" value="Edit story"> 
+    <button id="delete_story_btn" data-delete_story_btn="{{ story.hn_id }}" onclick="deleteStoryBtn();" class="btn btn-danger">Delete story</button>
+    <button type="button" id="cancel_story_btn {{ story.hn_id }}" data-cancel_story_btn="{{story.hn_id}}" onclick="cancelStoryBtn();" class="btn btn-danger">Cancel</button>  
+  </form>
+</div>
+{% endif %}
+{% if user_uuid %}
+<br>
+<div id="add_comment_form">
+<form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
+  {{ form.csrf_token }}
+  {{ form.method_type }}
+  <p>Add comment:</p>
+  {{ form.comment_text(class_="form-control") }}
+  <br>
+  <input class="btn btn-primary" type="submit" value="Add Comment">  
+</form>
+</div>
+<br>
+{% endif %}
+<h1>Comments:</h1>
+<div id="comments">
+{% for comment in story.comments%}
+<div id="comment {{comment.hn_id}}">
+  <div class="card">
+      <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
+      <div class="card-body">
+        <h5 id="comment_text {{ comment.hn_id }}" class="card-title">{{comment.text|safe}}</h5>
+      </div>
+  </div>
+  {% if user_uuid == comment.by and user_origin == comment.origin %}
+  <button id="edit_comment_btn" onclick="editCommentBtn();" data-edit_comment_btn="{{comment.hn_id}}" class="btn btn-primary">Edit</button>  
+  {% endif %} 
+</div>
+{% if user_uuid == comment.by %}
+<div id="edit_comment_form {{ comment.hn_id }}">
+  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
+    {{ form.csrf_token }}
+    {{ form.method_type(id="method_type {}".format(comment.hn_id)) }}
+    {{ form.comment_id(id="comment_id {}".format(comment.hn_id)) }}
+    <p>Edit comment:</p>
+    {{ form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.hn_id)) }}
+    <br>
+    <input class="btn btn-primary" type="submit" value="Edit Comment">
+    <button id="delete_comment_btn {{ comment.hn_id }}" data-delete_comment_btn="{{ comment.hn_id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
+    <button type="button" id="cancel_btn {{ comment.hn_id }}" data-cancel_comment_btn="{{comment.hn_id}}" onclick="cancelCommentBtn();" class="btn btn-danger">Cancel</button>  
+  </form>
+</div>
+{% endif %}  
+<br>
+{% endfor %}
+</div>
+</div>
+{% endblock %}
