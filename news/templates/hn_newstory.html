@@ -7,7 +7,9 @@
   <div class="card">
     <a class="title_url" href="#"><h5 class="card-header" id="story_title {{story.hn_id}}">{{story.title}}</h5></a>
     <div class="card-body">
+      {% if story.text %}
       <h5 class="card-title" id="story_text {{story.hn_id}}">{{story.text}}</h5>
+      {% endif %}
       <h5 class="card-title" id="story_by {{story.hn_id}}">{{story.by}}</h5>
       <a href="{{story.url}}" class="btn btn-primary" id="story_url {{story.hn_id}}">Story url</a>
       <a href="#" class="btn btn-primary" id="story_score {{story.hn_id}}">{{story.score}}</a>
@@ -65,29 +67,29 @@
 <!-- my_blog comments -->
 {% for comment in story.comments%}
 {% if comment.origin == "my_blog" %}
-<div id="comment {{comment.hn_id}}">
+<div id="comment {{comment.id}}">
   <div class="card">
       <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
       <div class="card-body">
-        <h5 id="comment_text {{ comment.hn_id }}" class="card-title">{{comment.text|safe}}</h5>
+        <h5 id="comment_text {{ comment.id }}" class="card-title">{{comment.text|safe}}</h5>
       </div>
   </div>
   {% if user_uuid == comment.by and user_origin == comment.origin %}
-  <button id="edit_comment_btn" onclick="editCommentBtn();" data-edit_comment_btn="{{comment.hn_id}}" class="btn btn-primary">Edit</button>  
+  <button id="edit_comment_btn" onclick="editCommentBtn();" data-edit_comment_btn="{{comment.id}}" class="btn btn-primary">Edit</button>  
   {% endif %} 
 </div>
 {% if user_uuid == comment.by %}
-<div id="edit_comment_form {{ comment.hn_id }}">
-  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
+<div id="edit_comment_form {{ comment.id }}">
+  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
     {{ form.csrf_token }}
-    {{ form.method_type(id="method_type {}".format(comment.hn_id)) }}
-    {{ form.comment_id(id="comment_id {}".format(comment.hn_id)) }}
+    {{ form.method_type(id="method_type {}".format(comment.id)) }}
+    {{ form.comment_id(id="comment_id {}".format(comment.id)) }}
     <p>Edit comment:</p>
-    {{ form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.hn_id)) }}
+    {{ form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.id)) }}
     <br>
     <input class="btn btn-primary" type="submit" value="Edit Comment">
-    <button id="delete_comment_btn {{ comment.hn_id }}" data-delete_comment_btn="{{ comment.hn_id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
-    <button type="button" id="cancel_btn {{ comment.hn_id }}" data-cancel_comment_btn="{{comment.hn_id}}" onclick="cancelCommentBtn();" class="btn btn-danger">Cancel</button>  
+    <button id="delete_comment_btn {{ comment.id }}" data-delete_comment_btn="{{ comment.id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
+    <button type="button" id="cancel_btn {{ comment.id }}" data-cancel_comment_btn="{{comment.id}}" onclick="cancelCommentBtn();" class="btn btn-danger">Cancel</button>  
   </form>
 </div>
 {% endif %}  
