@@ -67,7 +67,8 @@ def signup_page():
             if api_request.status_code == 201:
                 api_response = api_request.json()
                 user = UserObject(
-                    username=api_response["username"], origin=api_response["origin"]
+                    username=api_response["username"],
+                    origin=api_response["origin"]
                 )
                 access_token = create_access_token(
                     identity=user,
@@ -75,7 +76,8 @@ def signup_page():
                     expires_delta=datetime.timedelta(minutes=10),
                 )
                 refresh_token = create_refresh_token(
-                    identity=user, expires_delta=datetime.timedelta(minutes=10),
+                    identity=user,
+                    expires_delta=datetime.timedelta(minutes=10),
                 )
                 signup_response = make_response(
                     redirect(url_for("news.top_news_page_func"), 302)
@@ -123,10 +125,12 @@ def signin_page():
         if api_request.status_code == 200:
             api_response = api_request.json()
             user = UserObject(
-                username=api_response["username"], origin=api_response["origin"]
+                username=api_response["username"],
+                origin=api_response["origin"]
             )
             access_token = create_access_token(
-                identity=user, fresh=True, expires_delta=datetime.timedelta(minutes=10),
+                identity=user, fresh=True,
+                expires_delta=datetime.timedelta(minutes=10),
             )
             refresh_token = create_refresh_token(
                 identity=user, expires_delta=datetime.timedelta(minutes=10),
@@ -145,7 +149,7 @@ def signin_page():
             return signin_response
         else:
             api_response = api_request.json()
-            signin_form.username.errors.append(api_response["message"])
+            signin_form.username.errors.append(api_response.items())
             return render_template("signin.html", form=signin_form)
     else:
         return render_template("signin.html", form=signin_form)
@@ -171,7 +175,12 @@ users_bp.add_url_rule(
 users_bp.add_url_rule(
     "/signin", "signin_page_func", signin_page, methods=["GET", "POST"]
 )
-users_bp.add_url_rule("/logout", "logout_page_func", logout_page, methods=["GET"])
+users_bp.add_url_rule(
+    "/logout",
+    "logout_page_func",
+    logout_page,
+    methods=["GET"]
+)
 users_bp.add_url_rule(
     "/users/profile/<username>",
     "user_profile_page_func",

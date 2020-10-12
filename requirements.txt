@@ -13,6 +13,7 @@ Flask==1.1.2
 Flask-JWT-Extended==3.24.1
 Flask-Session==0.3.2
 Flask-WTF==0.14.3
+gunicorn==20.0.4
 idna==2.10
 itsdangerous==1.1.0
 Jinja2==2.11.2
