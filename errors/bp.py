@@ -1,18 +1,7 @@
 from flask import Blueprint, make_response, redirect, url_for, render_template
 from flask_jwt_extended import (
     JWTManager,
-    jwt_optional,
-    jwt_required,
-    jwt_refresh_token_required,
-    get_raw_jwt,
-    get_jwt_identity,
-    create_access_token,
-    create_refresh_token,
-    set_access_cookies,
-    set_refresh_cookies,
     unset_jwt_cookies,
-    unset_access_cookies,
-    verify_jwt_in_request,
 )
 
 errors_bp = Blueprint("errors", __name__, template_folder="templates")
@@ -67,7 +56,11 @@ def expired_tokens():
 
 @jwt.user_claims_loader
 def add_claims_to_access_token(user):
-    return {"user_origin": user.origin}
+    return {
+            "user_origin": user.origin,
+            "username": user.username,
+            "user_uuid": user.user_uuid
+        }
 
 
 @jwt.user_identity_loader

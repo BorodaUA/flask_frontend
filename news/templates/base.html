@@ -28,7 +28,7 @@
     </button>
     <div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
       <ul class="navbar-nav text-right">
-        {% if not user_uuid %}
+        {% if not username %}
         <li class="nav-item active">
           <a class="flex-sm-fill text-sm-center nav-link active my-2 my-sm-0" href="{{ url_for('users.signup_page_func')}}">Sign up</a>
         </li>
@@ -36,12 +36,12 @@
           <a class="nav-link" href="{{ url_for('users.signin_page_func')}}">Sign in</a>
         </li>
         {% endif %}
-        {% if user_uuid %}
+        {% if username %}
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('news.submit_story_func')}}">Submit Story</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('users.user_profile_page_func', username=user_uuid)}}">User Profile</a>
+          <a class="nav-link" href="{{ url_for('users.user_profile_page_func', username=username)}}">User Profile</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('users.logout_page_func')}}">Logout</a>

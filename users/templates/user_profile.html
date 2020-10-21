@@ -1,10 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>User Profile</h1>
-{% if user_data %}
-<h2>Hello user_data: {{user_data}}</h2>
-{% else %}
-<h2>Hello username: {{username}}</h2>
-{% endif %}
-<h2>Origin: {{user_origin}} </h2>
+<h2 id="username">Hello: {{username}}</h2>
+<h2 id="user_origin">Origin: {{user_origin}} </h2>
+<h2 id="user_uuid">User_uuid: {{user_uuid}} </h2>
 {% endblock %}

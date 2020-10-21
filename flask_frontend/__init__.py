@@ -1,4 +1,3 @@
-import os
 from flask import Flask
 from flask_frontend.app_handlers import register_app_handlers
 from errors.bp import jwt, register_error_handlers

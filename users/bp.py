@@ -5,24 +5,18 @@ from flask import (
     make_response,
     url_for,
     redirect,
-    session,
 )
 from users.libs.signin_form import LoginForm
 from users.libs.signup_form import SignupForm
 import requests
 from flask_jwt_extended import (
-    JWTManager,
     jwt_optional,
     jwt_required,
-    jwt_refresh_token_required,
-    get_raw_jwt,
-    get_jwt_identity,
     create_access_token,
     create_refresh_token,
     set_access_cookies,
     set_refresh_cookies,
     unset_jwt_cookies,
-    unset_access_cookies,
 )
 import datetime
 import os
@@ -34,7 +28,7 @@ BACKEND_SERVICE_NAME = os.environ.get("BACKEND_SERVICE_NAME")
 BACKEND_SERVICE_PORT = os.environ.get("BACKEND_SERVICE_PORT")
 
 USER_SIGNUP_URL = (
-    f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/users/register"
+    f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/users"
 )
 USER_SIGNIN_URL = (
     f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/users/signin"
@@ -44,9 +38,10 @@ users_bp = Blueprint("users", __name__, template_folder="templates")
 
 
 class UserObject:
-    def __init__(self, username, origin):
+    def __init__(self, username, origin, user_uuid):
         self.username = username
         self.origin = origin
+        self.user_uuid = user_uuid
 
 
 def signup_page():
@@ -68,7 +63,8 @@ def signup_page():
                 api_response = api_request.json()
                 user = UserObject(
                     username=api_response["username"],
-                    origin=api_response["origin"]
+                    origin=api_response["origin"],
+                    user_uuid=api_response["user_uuid"]
                 )
                 access_token = create_access_token(
                     identity=user,
@@ -87,7 +83,25 @@ def signup_page():
                 return signup_response
             else:
                 signup_response = api_request.json()
-                signup_form.username.errors.append(signup_response["message"])
+                # key_error_1 = list(signup_response)[0]
+                # value_error = list(*signup_response.values())[0]
+                # key_error_1 = key_error_1
+                # res = [
+                #     key_error_1
+                #     # *signup_response.values()
+                # ]
+                # signup_form.errors.update(**signup_response)
+                # a = 10
+                for key, value in signup_response.items():
+                    key
+                    value
+                    if key not in signup_form._fields:
+                        key = 'username'
+                        value = [value]
+                    signup_form[key].errors.append(
+                        f"{key.capitalize()} - {value[0]}"
+                    )
+                # signup_form.errors.add(signup_response.items())
                 return render_template("signup.html", form=signup_form)
         else:
             return render_template("signup.html", form=signup_form)
@@ -126,7 +140,8 @@ def signin_page():
             api_response = api_request.json()
             user = UserObject(
                 username=api_response["username"],
-                origin=api_response["origin"]
+                origin=api_response["origin"],
+                user_uuid=api_response["user_uuid"]
             )
             access_token = create_access_token(
                 identity=user, fresh=True,
@@ -160,13 +175,7 @@ def user_profile_page(username):
     """
     A view func for a '/users/profile/<username>' endpoint.
     """
-    current_user = get_jwt_identity()
-    # access_token_cookie = request.cookies.get('access_token_cookie')
-    # cookie_uuid = request.cookies.get('username')
-
-    return render_template(
-        "user_profile.html", user_data=current_user, username=username
-    )
+    return render_template("user_profile.html")
 
 
 users_bp.add_url_rule(
