@@ -193,7 +193,6 @@ def test_signup_valid_username_email_password(client):
             }
     )
     response = client.get("/users/profile/test_bob_2")
-    # current_user = get_jwt_identity()
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(

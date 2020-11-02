@@ -83,25 +83,13 @@ def signup_page():
                 return signup_response
             else:
                 signup_response = api_request.json()
-                # key_error_1 = list(signup_response)[0]
-                # value_error = list(*signup_response.values())[0]
-                # key_error_1 = key_error_1
-                # res = [
-                #     key_error_1
-                #     # *signup_response.values()
-                # ]
-                # signup_form.errors.update(**signup_response)
-                # a = 10
                 for key, value in signup_response.items():
-                    key
-                    value
                     if key not in signup_form._fields:
                         key = 'username'
                         value = [value]
                     signup_form[key].errors.append(
                         f"{key.capitalize()} - {value[0]}"
                     )
-                # signup_form.errors.add(signup_response.items())
                 return render_template("signup.html", form=signup_form)
         else:
             return render_template("signup.html", form=signup_form)
@@ -164,7 +152,16 @@ def signin_page():
             return signin_response
         else:
             api_response = api_request.json()
-            signin_form.username.errors.append(api_response.items())
+            for key, value in api_response.items():
+                key
+                value
+                if key not in signin_form._fields:
+                    key = 'username'
+                    value = [value]
+                signin_form[key].errors.append(
+                    f"{key.capitalize()} - {value[0]}"
+                )
+            # signin_form.username.errors.append(api_response.items())
             return render_template("signin.html", form=signin_form)
     else:
         return render_template("signin.html", form=signin_form)
