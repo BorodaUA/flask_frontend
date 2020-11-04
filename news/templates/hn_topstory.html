@@ -15,14 +15,14 @@
       <a href="#" class="btn btn-primary" id="story_score {{story.hn_id}}">{{story.score}}</a>
     </div>
 </div>
-{% if user_uuid == story.by and user_origin == story.origin %}
+{% if username == story.by and user_origin == story.origin %}
 <br>
 <div id="edit_story_btn {{story.hn_id}}">
   <button id="edit_story_btn" data-edit_story_btn="{{story.hn_id}}" onclick="editStoryBtn();" class="btn btn-primary">Edit</button>
 </div> 
 {% endif %} 
 </div>
-{% if user_uuid == story.by and user_origin == story.origin %}
+{% if username == story.by and user_origin == story.origin %}
 <div id="edit_story_form {{ story.hn_id }}">
   <form class="story_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
     {{ edit_story_form.csrf_token }}
@@ -74,11 +74,11 @@
         <h5 id="comment_text {{ comment.id }}" class="card-title">{{comment.text|safe}}</h5>
       </div>
   </div>
-  {% if user_uuid == comment.by and user_origin == comment.origin %}
+  {% if username == comment.by and user_origin == comment.origin %}
   <button id="edit_comment_btn" onclick="editCommentBtn();" data-edit_comment_btn="{{comment.id}}" class="btn btn-primary">Edit</button>  
   {% endif %} 
 </div>
-{% if user_uuid == comment.by %}
+{% if username == comment.by %}
 <div id="edit_comment_form {{ comment.id }}">
   <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
     {{ form.csrf_token }}

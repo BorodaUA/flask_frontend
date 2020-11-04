@@ -139,7 +139,7 @@ def test_signin_valid_username_email_password_user_not_registered(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     assert ['Hello: None'] == username
@@ -158,7 +158,7 @@ def test_signin_valid_username_password(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     assert ['Hello: test_bob_2'] == username
@@ -173,7 +173,7 @@ def test_signin_valid_username_password(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(
@@ -204,7 +204,7 @@ def test_signin_valid_email_password(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     assert ['Hello: test_bob_2'] == username
@@ -219,7 +219,7 @@ def test_signin_valid_email_password(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(
@@ -251,7 +251,7 @@ def test_signin_valid_username_email_password_2_times(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     assert ['Hello: test_bob_2'] == username
@@ -266,7 +266,7 @@ def test_signin_valid_username_email_password_2_times(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(
@@ -280,7 +280,7 @@ def test_signin_valid_username_email_password_2_times(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(

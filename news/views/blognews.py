@@ -7,7 +7,11 @@ from flask import (
     abort,
     url_for,
 )
-from flask_jwt_extended import jwt_optional, get_jwt_identity, jwt_required
+from flask_jwt_extended import (
+    jwt_optional,
+    get_jwt_identity,
+    jwt_required
+    )
 import requests
 from news.libs.story_form import StoryForm
 import os
@@ -36,7 +40,6 @@ def submit_story():
             f"/api/blognews/"
         )
         api_request_data = {
-
             "by": current_user,
             "title": submit_story_form.story_title.data,
             "url": submit_story_form.story_url.data,
@@ -51,7 +54,15 @@ def submit_story():
             )
             return resp
         else:
-            abort(404)
+            resp = make_response(
+                render_template("submit_story.html", form=submit_story_form,)
+            )
+            return resp
+    else:
+        resp = make_response(
+            render_template("submit_story.html", form=submit_story_form,)
+        )
+        return resp
 
 
 @jwt_optional

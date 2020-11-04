@@ -192,7 +192,7 @@ def test_signup_valid_username_email_password(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(
@@ -223,7 +223,7 @@ def test_signup_2_times_valid_username_email_password(client):
                 'password': '123456',
             }
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(
@@ -243,7 +243,7 @@ def test_signup_2_times_valid_username_email_password(client):
     assert (
         'User with this username already exist' == first_error
     )
-    response = client.get("/users/profile/test_bob_2")
+    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
     username = tree.xpath('//*/h2[@id="username"]/text()')
     user_uuid = tree.xpath(

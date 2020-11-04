@@ -16,7 +16,7 @@
       <br>
       {% for key, value in form.errors.items() %}
             {% for error_message in value %}
-                <li>{{ error_message }}</li>
+                <li>{{ form[key].label.text }} - {{ error_message }}</li>
             {% endfor %}
         {% endfor %}
       <br>

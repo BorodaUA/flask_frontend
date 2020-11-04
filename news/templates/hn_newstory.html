@@ -48,7 +48,7 @@
   </form>
 </div>
 {% endif %}
-{% if user_uuid %}
+{% if username %}
 <br>
 <div id="add_comment_form">
 <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
@@ -74,13 +74,13 @@
         <h5 id="comment_text {{ comment.id }}" class="card-title">{{comment.text|safe}}</h5>
       </div>
   </div>
-  {% if user_uuid == comment.by and user_origin == comment.origin %}
+  {% if username == comment.by and user_origin == comment.origin %}
   <button id="edit_comment_btn" onclick="editCommentBtn();" data-edit_comment_btn="{{comment.id}}" class="btn btn-primary">Edit</button>  
   {% endif %} 
 </div>
-{% if user_uuid == comment.by %}
+{% if username == comment.by %}
 <div id="edit_comment_form {{ comment.id }}">
-  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
+  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
     {{ form.csrf_token }}
     {{ form.method_type(id="method_type {}".format(comment.id)) }}
     {{ form.comment_id(id="comment_id {}".format(comment.id)) }}

@@ -1,29 +1,30 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, TextField
+from wtforms import TextAreaField, StringField
 from wtforms.validators import InputRequired, Length
 from wtforms.widgets import HiddenInput
 
 
 class StoryForm(FlaskForm):
-    method_type = TextField(widget=HiddenInput(), default="PATCH")
-    story_title = TextField(
+    method_type = StringField(widget=HiddenInput(), default="PATCH")
+    story_title = StringField(
+        label='Story Title',
         validators=[
             InputRequired(),
             Length(
                 min=3,
                 max=256,
                 message=(
-                    "Story Title must be between 3 and 256 characters long."
+                    "must be between 3 and 256 characters long."
                 ),
             ),
         ]
     )
-    story_url = TextField(validators=[
+    story_url = StringField(validators=[
         InputRequired(),
         Length(
                 min=3,
                 max=256,
-                message="Story Url must be between 3 and 256 characters long.",
+                message="must be between 3 and 256 characters long.",
             ),
         ])
     story_text = TextAreaField(validators=[
@@ -32,7 +33,7 @@ class StoryForm(FlaskForm):
                 min=3,
                 max=2048,
                 message=(
-                    "Story Text must be between 3 and 2048 characters long."
+                    "must be between 3 and 2048 characters long."
                 ),
             ),
         ])
