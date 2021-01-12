@@ -66,11 +66,11 @@ def submit_story():
 
 
 @jwt_optional
-def blog_news_page(page_number: 1):
+def blog_news_page(page_number):
     """
-    A view func for '/blognews/?pagenumber=n' endpoint
+    A view func for '/blognews' endpoint, after
+    first page for '/blognews/<page_number>' endpoint
     """
-    print(session)
     BlogNewsStoriesUrl = (
         f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
         f"/api/blognews/?pagenumber={page_number}"

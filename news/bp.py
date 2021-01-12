@@ -74,6 +74,13 @@ news_bp.add_url_rule(
     methods=["GET", "POST"]
 )
 news_bp.add_url_rule(
+    rule="/blognews",
+    endpoint="blog_news_page_func",
+    view_func=blog_news_page,
+    methods=["GET"],
+    defaults={"page_number": 1},
+)
+news_bp.add_url_rule(
     rule="/blognews/<int:page_number>",
     endpoint="blog_news_page_func",
     view_func=blog_news_page,
