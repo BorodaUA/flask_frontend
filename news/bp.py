@@ -55,14 +55,14 @@ news_bp.add_url_rule(
     methods=["GET"]
 )
 news_bp.add_url_rule(
-    rule="/newest",
+    rule="/hackernews/newest",
     endpoint="new_news_page_func",
     view_func=new_news_page,
     methods=["GET"],
     defaults={"page_number": 1},
 )
 news_bp.add_url_rule(
-    rule="/newest/<int:page_number>",
+    rule="/hackernews/newest/<int:page_number>",
     endpoint="new_news_page_func",
     view_func=new_news_page,
     methods=["GET"]

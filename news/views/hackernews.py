@@ -62,8 +62,8 @@ def top_news_page(page_number):
 @jwt_optional
 def new_news_page(page_number):
     """
-    A view func for '/newest' endpoint, after
-    first page for /newest/<page_number>
+    A view func for '/hackernews/newest' endpoint, after
+    first page for /hackernews/newest/<page_number>
     """
     HN_NEW_STORIES = (
         f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
