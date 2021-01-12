@@ -2,7 +2,7 @@
 {% block content %}
 <div id="container" class="container">
 <br>
-<h1>Story page</h1>
+<h1 class="blognews_story" >Story page</h1>
 <div id="story {{story.id}}" data-story_id="{{ story.id }}">
   <div class="card">
     <a class="title_url" href="#"><h5 class="card-header" id="story_title {{story.id}}">{{story.title}}</h5></a>
@@ -52,6 +52,12 @@
   <p>Add comment:</p>
   {{ form.comment_text(class_="form-control") }}
   <br>
+      {% for key, value in form.errors.items() %}
+          {% for error_message in value %}
+              <li>{{ error_message }}</li>
+          {% endfor %}
+      {% endfor %}
+  <br>
   <input class="btn btn-primary" type="submit" value="Add Comment">  
 </form>
 </div>
@@ -62,7 +68,7 @@
 {% for comment in story.comments%}
 <div id="comment {{comment.id}}">
   <div class="card">
-      <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
+      <a class="comment_by_link {{ comment.id }}" href="{{ url_for('users.user_profile_page_func', username=comment.by) }}"><h5 id="comment_by {{comment.id}}" class="card-header">{{comment.by}}</h5></a>
       <div class="card-body">
         <h5 id="comment_text {{ comment.id }}" class="card-title">{{comment.text|safe}}</h5>
       </div>
@@ -79,6 +85,12 @@
     {{ form.comment_id(id="comment_id {}".format(comment.id)) }}
     <p>Edit comment:</p>
     {{ form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.id)) }}
+    <br>
+        {% for key, value in form.errors.items() %}
+            {% for error_message in value %}
+                <li>{{ error_message }}</li>
+            {% endfor %}
+        {% endfor %}
     <br>
     <input class="btn btn-primary" type="submit" value="Edit Comment">
     <button id="delete_comment_btn {{ comment.id }}" data-delete_comment_btn="{{ comment.id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>

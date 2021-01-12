@@ -2,12 +2,12 @@
 {% block content %}
 
 <div class="container">
-    <h1>News page</h1>
+    <h1 class="blognews_stories" >News page</h1>
 {% if stories %}
 {% for item in stories['items'] %}
     <div class="story">
         <div class="card">
-            <a class="title_url" href="{{ url_for(story_view_func, story_id=item.id)}}"><h5 class="card-header">{{item.title}}</h5></a>
+            <a class="title_url" href="{{ url_for(story_view_func, story_id=item.id)}}"><h5 id="story_title {{ item.id }}" class="card-header">{{item.title}}</h5></a>
             <div class="card-body">
               <h5 class="card-title">{{item.by}}</h5>
               <a href={{item.hn_url}}><p class="card-text">{{item.hn_url}}</p></a>

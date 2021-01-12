@@ -163,9 +163,10 @@ def test_signin_valid_username_password(client):
     username = tree.xpath('//*/h2[@id="username"]/text()')
     assert ['Hello: test_bob_2'] == username
     response = client.get("/logout", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     response = client.post(
         "/signin",
         data={
@@ -210,8 +211,10 @@ def test_signin_valid_email_password(client):
     assert ['Hello: test_bob_2'] == username
     response = client.get("/logout", follow_redirects=True)
     tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     response = client.post(
         "/signin",
         data={
@@ -257,8 +260,10 @@ def test_signin_valid_username_email_password_2_times(client):
     assert ['Hello: test_bob_2'] == username
     response = client.get("/logout", follow_redirects=True)
     tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     response = client.post(
         "/signin",
         data={

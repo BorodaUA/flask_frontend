@@ -19,6 +19,30 @@ def client():
         yield client
 
 
+def delete_user(client):
+    response = client.post(
+        "/signin",
+        data={
+                'username': 'test_bob_2',
+                'password': '123456',
+            }
+    )
+    response = client.get("/users/profile/bob_2", follow_redirects=True)
+    tree = html.fromstring(response.data)
+    username = tree.xpath('//*/h2[@id="username"]/text()')
+    user_uuid = tree.xpath(
+        '//*/h2[@id="user_uuid"]/text()'
+    )[0].split(' ')[1]
+    UserDeleteUrl = (
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
+        f"users/{user_uuid}"
+        )
+    response = requests.delete(
+        UserDeleteUrl
+    )
+    response = client.get("/users/profile/bob_2", follow_redirects=True)
+
+
 def test_config():
     """
     Test flask_frontend "testing" config
@@ -184,6 +208,7 @@ def test_signup_valid_username_email_password(client):
     Test /signup endpoint
     with valid username, email_address, password
     """
+    delete_user(client=client)
     response = client.post(
         "/signup",
         data={

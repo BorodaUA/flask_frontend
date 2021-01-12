@@ -95,8 +95,10 @@ def test_get_submit_page(client):
     # login out after regestration
     response = client.get("/logout", follow_redirects=True)
     tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     # signin with registered username
     response = client.post(
         "/signin",
@@ -154,8 +156,10 @@ def test_post_submit_page_no_required_fields(client):
     # login out after regestration
     response = client.get("/logout", follow_redirects=True)
     tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     # signin with registered username
     response = client.post(
         "/signin",
@@ -220,9 +224,10 @@ def test_post_submit_page_empty_required_fields(client):
     assert ['Hello: test_bob_2'] == username
     # login out after regestration
     response = client.get("/logout", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     # signin with registered username
     response = client.post(
         "/signin",
@@ -295,8 +300,10 @@ def test_post_submit_page_short_required_fields(client):
     # login out after regestration
     response = client.get("/logout", follow_redirects=True)
     tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     # signin with registered username
     response = client.post(
         "/signin",
@@ -390,8 +397,10 @@ def test_post_submit_page_long_required_fields(client):
     # login out after regestration
     response = client.get("/logout", follow_redirects=True)
     tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     # signin with registered username
     response = client.post(
         "/signin",
@@ -485,8 +494,10 @@ def test_post_submit_page_valid_story_fields(client):
     # login out after regestration
     response = client.get("/logout", follow_redirects=True)
     tree = html.fromstring(response.data)
-    news_page = tree.xpath('//*/h1/text()')
-    assert ['News page'] == news_page
+    blognews_page = tree.xpath(
+        '//*/a[contains(text(),"Blog News")]/text()'
+    )
+    assert ['Blog News'] == blognews_page
     # signin with registered username
     response = client.post(
         "/signin",
