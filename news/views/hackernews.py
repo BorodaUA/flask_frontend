@@ -29,9 +29,9 @@ BACKEND_SERVICE_PORT = os.environ.get("BACKEND_SERVICE_PORT")
 @jwt_optional
 def top_news_page(page_number):
     """
-    A view func for '/' endpoint, aftef first page for /news/<page_number>
+    A view func for '/hackernews' endpoint,
+    after first page for /hackernews/<page_number>
     """
-    print(session)
     HN_TOP_STORIES = (
         f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
         f"hackernews/topstories/?pagenumber={page_number}"

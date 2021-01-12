@@ -42,14 +42,14 @@ def add_cookie(response):
 
 
 news_bp.add_url_rule(
-    rule="/",
+    rule="/hackernews",
     endpoint="top_news_page_func",
     view_func=top_news_page,
     methods=["GET"],
     defaults={"page_number": 1},
 )
 news_bp.add_url_rule(
-    rule="/news/<int:page_number>",
+    rule="/hackernews/<int:page_number>",
     endpoint="top_news_page_func",
     view_func=top_news_page,
     methods=["GET"]
