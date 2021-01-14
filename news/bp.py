@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from news.views.blognews import submit_story, blog_news_page
 from news.views.hackernews import new_news_page, top_news_page
 from news.views.story import story_page
+from news.views.blognews_story import blognews_story_page
 
 load_dotenv()
 
@@ -90,5 +91,11 @@ news_bp.add_url_rule(
     rule="/submit",
     endpoint="submit_story_func",
     view_func=submit_story,
+    methods=["GET", "POST"]
+)
+news_bp.add_url_rule(
+    rule="/blognews/story/<int:story_id>",
+    endpoint="blognews_story_page_func",
+    view_func=blognews_story_page,
     methods=["GET", "POST"]
 )

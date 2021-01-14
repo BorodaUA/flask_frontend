@@ -93,7 +93,7 @@ def blog_news_page(page_number):
                 "blognews_stories.html",
                 stories=api_response,
                 current_view_func="news.blog_news_page_func",
-                story_view_func="news.story_page_func",
+                story_view_func="news.blognews_story_page_func",
             )
         )
         return resp

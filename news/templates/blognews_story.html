@@ -18,8 +18,8 @@
   </div>
 </div>
 {% if username == story.by and user_origin == story.origin %}
-<div id="edit_story_form {{ story.id }}">
-  <form class="story_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
+<div id="edit_story_form_container">
+  <form id="story_form {{ story.id }}" method="post" action="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}">
     {{ edit_story_form.csrf_token }}
     {{ edit_story_form.method_type(class_="form-control", id="form_method_type {}".format(story.id)) }}
     <p>Story Title:</p>
@@ -37,28 +37,30 @@
       {% endfor %}
     {% endfor %}
     <br>
-    <input class="btn btn-primary" type="submit" value="Edit story"> 
-    <button id="delete_story_btn" data-delete_story_btn="{{ story.id }}" onclick="deleteStoryBtn();" class="btn btn-danger">Delete story</button>
+    {{ edit_story_form.edit_story_submit(class_="btn btn-primary") }}
+    <!-- <input class="btn btn-primary" type="submit" value="Edit story">  -->
+    <button type="button" id="delete_story_btn" data-delete_story_btn="{{ story.id }}" onclick="deleteStoryBtn();" class="btn btn-danger">Delete story</button>
     <button type="button" id="cancel_story_btn {{ story.id }}" data-cancel_story_btn="{{story.id}}" onclick="cancelStoryBtn();" class="btn btn-danger">Cancel</button>  
   </form>
 </div>
 {% endif %}
 {% if user_uuid %}
 <br>
-<div id="add_comment_form">
-<form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
-  {{ form.csrf_token }}
-  {{ form.method_type }}
+<div id="add_comment_form_container">
+<form class="add_comment_form" method="post" action="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}">
+  {{ add_comment_form.csrf_token }}
+  {{ add_comment_form.method_type }}
   <p>Add comment:</p>
-  {{ form.comment_text(class_="form-control") }}
+  {{ add_comment_form.comment_text(class_="form-control") }}
   <br>
-      {% for key, value in form.errors.items() %}
+      {% for key, value in add_comment_form.errors.items() %}
           {% for error_message in value %}
               <li>{{ error_message }}</li>
           {% endfor %}
       {% endfor %}
   <br>
-  <input class="btn btn-primary" type="submit" value="Add Comment">  
+  {{ add_comment_form.add_comment_submit(class_="btn btn-primary") }}
+  <!-- <input class="btn btn-primary" type="submit" value="Add Comment">   -->
 </form>
 </div>
 <br>
@@ -79,21 +81,22 @@
 </div>
 {% if username == comment.by %}
 <div id="edit_comment_form {{ comment.id }}">
-  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
-    {{ form.csrf_token }}
-    {{ form.method_type(id="method_type {}".format(comment.id)) }}
-    {{ form.comment_id(id="comment_id {}".format(comment.id)) }}
+  <form id="edit_comment_form {{ comment.id }}" method="post" action="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}">
+    {{ edit_comment_form.csrf_token }}
+    {{ edit_comment_form.method_type(id="method_type {}".format(comment.id)) }}
+    {{ edit_comment_form.comment_id(id="comment_id {}".format(comment.id)) }}
     <p>Edit comment:</p>
-    {{ form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.id)) }}
+    {{ edit_comment_form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.id)) }}
     <br>
-        {% for key, value in form.errors.items() %}
+        {% for key, value in edit_comment_form.errors.items() %}
             {% for error_message in value %}
                 <li>{{ error_message }}</li>
             {% endfor %}
         {% endfor %}
     <br>
-    <input class="btn btn-primary" type="submit" value="Edit Comment">
-    <button id="delete_comment_btn {{ comment.id }}" data-delete_comment_btn="{{ comment.id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
+    {{ edit_comment_form.edit_comment_submit(class_="btn btn-primary") }}
+    <!-- <input class="btn btn-primary" type="submit" value="Edit Comment"> -->
+    <button type="button" id="delete_comment_btn {{ comment.id }}" data-delete_comment_btn="{{ comment.id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
     <button type="button" id="cancel_btn {{ comment.id }}" data-cancel_comment_btn="{{comment.id}}" onclick="cancelCommentBtn();" class="btn btn-danger">Cancel</button>  
   </form>
 </div>

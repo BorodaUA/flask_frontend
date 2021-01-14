@@ -24,8 +24,11 @@ def api_caller(url, method):
     """
     Returning result of the api call
     """
-    api_request = requests.request(method=method, url=url)
-    return api_request
+    try:
+        api_request = requests.request(method=method, url=url)
+        return api_request
+    except requests.exceptions.ConnectionError:
+        return False
 
 
 @jwt_optional

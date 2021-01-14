@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import TextAreaField, StringField
+from wtforms import TextAreaField, StringField, SubmitField
 from wtforms.validators import InputRequired, Length
 from wtforms.widgets import HiddenInput
 
@@ -37,3 +37,4 @@ class StoryForm(FlaskForm):
                 ),
             ),
         ])
+    edit_story_submit = SubmitField('Edit story')
