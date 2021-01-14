@@ -2,7 +2,9 @@ function showEditComment(event) {
     comment_id = event.target.getAttribute('data-edit_comment_btn')
     if (comment_id != null){
         var comment = document.getElementById('comment '+comment_id)
-        var edit_comment_form = document.getElementById('edit_comment_form '+comment_id)
+        var edit_comment_form = document.getElementById(
+            'edit_comment_form_container '+comment_id
+        )
         comment.style.display = "none";
         edit_comment_form.style.display = "block";
         // 
@@ -14,8 +16,8 @@ function showEditComment(event) {
         comment_textarea.value = comment_text;
         comment_textarea.focus();
         // 
-        var comment_id_input = document.getElementById("comment_id "+ comment_id)
-        comment_id_input.value = comment_id
+        // var comment_id_input = document.getElementById("comment_id "+ comment_id)
+        // comment_id_input.value = comment_id
     };
 };
 function deleteComment(event) {

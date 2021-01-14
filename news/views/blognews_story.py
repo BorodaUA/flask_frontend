@@ -28,7 +28,10 @@ def blognews_story_page(story_id):
     #
     edit_story_form = StoryForm()
     add_comment_form = AddCommentForm()
-    edit_comment_form = EditCommentForm()
+    # edit_comment_form = EditCommentForm(
+    #     request.form,
+    #     prefix='edit_comment_form'
+    # )
     current_user = get_jwt_identity()
     #
     BLOG_NEWS_STORY_URL = (
@@ -43,6 +46,15 @@ def blognews_story_page(story_id):
     except requests.exceptions.ConnectionError:
         return abort(404)
     api_response_blog_stories = api_request_blog_stories.json()
+    edit_comments_forms = []
+    for comment in api_response_blog_stories['comments']:
+        comment_id = comment['id']
+        edit_comment_form = EditCommentForm(
+            request.form,
+            prefix=f'{comment_id}'
+        )
+        edit_comment_form.comment_id = comment_id
+        edit_comments_forms.append(edit_comment_form)
     if request.method == "GET":
         if api_request_blog_stories.status_code == 200:
             resp = make_response(
@@ -51,7 +63,8 @@ def blognews_story_page(story_id):
                     story=api_response_blog_stories,
                     edit_story_form=edit_story_form,
                     add_comment_form=add_comment_form,
-                    edit_comment_form=edit_comment_form
+                    edit_comments_forms=edit_comments_forms,
+                    zip=zip
                 )
             )
             return resp
@@ -108,7 +121,8 @@ def blognews_story_page(story_id):
                         story=api_response_blog_stories,
                         edit_story_form=edit_story_form,
                         add_comment_form=add_comment_form,
-                        edit_comment_form=edit_comment_form
+                        edit_comments_forms=edit_comments_forms,
+                        zip=zip
                     )
                 )
                 return resp
@@ -146,46 +160,49 @@ def blognews_story_page(story_id):
                         story=api_response_blog_stories,
                         edit_story_form=edit_story_form,
                         add_comment_form=add_comment_form,
-                        edit_comment_form=edit_comment_form
+                        edit_comments_forms=edit_comments_forms,
+                        zip=zip
                     )
                 )
                 return resp
-        # edit comment form
-        if edit_comment_form.edit_comment_submit.data:
-            if edit_comment_form.validate_on_submit():
-                api_request_method = edit_comment_form.method_type.data
-                PatchDeleteCommentUrl = (
-                    f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
-                    f"/api/blognews/{story_id}"
-                    f"/comments/{edit_comment_form.comment_id.data}"
-                )
-                api_request_data = {
-                    "by": current_user,
-                    "text": edit_comment_form.comment_text.data,
-                }
-                if api_request_method == "PATCH":
-                    patch_comment_request = requests.patch(
-                        PatchDeleteCommentUrl,
-                        json=api_request_data
+        # edit comments forms
+        for edit_comment_form in edit_comments_forms:
+            if edit_comment_form.edit_comment_submit.data:
+                if edit_comment_form.validate_on_submit():
+                    api_request_method = edit_comment_form.method_type.data
+                    PatchDeleteCommentUrl = (
+                        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
+                        f"/api/blognews/{story_id}"
+                        f"/comments/{edit_comment_form.comment_id}"
                     )
-                    if patch_comment_request.status_code == 200:
-                        resp = make_response(
-                            redirect(url_for(
-                                "news.blognews_story_page_func",
-                                story_id=story_id,
-                            ), 302)
+                    api_request_data = {
+                        "by": current_user,
+                        "text": edit_comment_form.comment_text.data,
+                    }
+                    if api_request_method == "PATCH":
+                        patch_comment_request = requests.patch(
+                            PatchDeleteCommentUrl,
+                            json=api_request_data
                         )
-                        return resp
-                    else:
-                        abort(404)
-            else:
-                resp = make_response(
-                    render_template(
-                        template_name_or_list="blognews_story.html",
-                        story=api_response_blog_stories,
-                        edit_story_form=edit_story_form,
-                        add_comment_form=add_comment_form,
-                        edit_comment_form=edit_comment_form
+                        if patch_comment_request.status_code == 200:
+                            resp = make_response(
+                                redirect(url_for(
+                                    "news.blognews_story_page_func",
+                                    story_id=story_id,
+                                ), 302)
+                            )
+                            return resp
+                        else:
+                            abort(404)
+                else:
+                    resp = make_response(
+                        render_template(
+                            template_name_or_list="blognews_story.html",
+                            story=api_response_blog_stories,
+                            edit_story_form=edit_story_form,
+                            add_comment_form=add_comment_form,
+                            edit_comments_forms=edit_comments_forms,
+                            zip=zip
+                        )
                     )
-                )
-                return resp
+                    return resp
