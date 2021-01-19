@@ -5,7 +5,7 @@ from wtforms.widgets import HiddenInput
 
 
 class StoryForm(FlaskForm):
-    method_type = StringField(widget=HiddenInput(), default="PATCH")
+    story_form_method_type = StringField(widget=HiddenInput(), default="PATCH")
     story_title = StringField(
         label='Story Title',
         validators=[
@@ -14,7 +14,7 @@ class StoryForm(FlaskForm):
                 min=3,
                 max=256,
                 message=(
-                    "must be between 3 and 256 characters long."
+                    "Story Title - must be between 3 and 256 characters long."
                 ),
             ),
         ]
@@ -24,7 +24,8 @@ class StoryForm(FlaskForm):
         Length(
                 min=3,
                 max=256,
-                message="must be between 3 and 256 characters long.",
+                message="Story Url - must be between 3 and "
+                "256 characters long.",
             ),
         ])
     story_text = TextAreaField(validators=[
@@ -33,7 +34,7 @@ class StoryForm(FlaskForm):
                 min=3,
                 max=2048,
                 message=(
-                    "must be between 3 and 2048 characters long."
+                    "Story Text - must be between 3 and 2048 characters long."
                 ),
             ),
         ])

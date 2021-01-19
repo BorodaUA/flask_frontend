@@ -1,10 +1,14 @@
 {% extends "base.html" %}
+{% block head_content %}
+<script src="{{ url_for('news.static', filename='js/story.js') }}"></script>
+<script src="{{ url_for('news.static', filename='js/comment.js') }}"></script>
+{% endblock %}
 {% block content %}
 <div id="container" class="container">
 <br>
 <h1 class="blognews_story" >Story page</h1>
 <!-- Story  -->
-<div id="story {{story.id}}" data-story_id="{{ story.id }}">
+<div id="story" data-story_id="{{ story.id }}">
   <div class="card">
     <a class="title_url" href="#"><h5 class="card-header" id="story_title {{story.id}}">{{story.title}}</h5></a>
     <div class="card-body">
@@ -23,7 +27,7 @@
 <div id="edit_story_form_container">
   <form id="story_form {{ story.id }}" method="post" action="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}">
     {{ edit_story_form.csrf_token }}
-    {{ edit_story_form.method_type(class_="form-control", id="form_method_type {}".format(story.id)) }}
+    {{ edit_story_form.story_form_method_type(class_="form-control", id="form_method_type {}".format(story.id)) }}
     <p>Story Title:</p>
     {{ edit_story_form.story_title(class_="form-control", id="form_story_title {}".format(story.id)) }}
     <br>
@@ -35,7 +39,7 @@
     <br>
     {% for key, value in edit_story_form.errors.items() %}
       {% for error_message in value %}
-          <li>{{ error_message }}</li>
+          <li id="edit_story_form_error">{{ error_message }}</li>
       {% endfor %}
     {% endfor %}
     <br>
@@ -51,7 +55,7 @@
 <div id="add_comment_form_container">
 <form class="add_comment_form" method="post" action="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}">
   {{ add_comment_form.csrf_token }}
-  {{ add_comment_form.method_type }}
+  {{ add_comment_form.add_comment_form_method_type(id="add_comment_form_method_type") }}
   <p>Add comment:</p>
   {{ add_comment_form.comment_text(class_="form-control") }}
   <br>
@@ -87,18 +91,18 @@
 <div id="edit_comment_form_container {{ comment.id }}">
   <form name="ecf {{ comment.id }}" id="edit_comment_form {{ comment.id }}" method="post" action="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}">
     {{ edit_comment_form.csrf_token }}
-    {{ edit_comment_form.method_type(id="method_type {}".format(comment.id)) }}
+    {{ edit_comment_form.edit_comment_form_method_type(id="method_type {}".format(comment.id)) }}
     
     <p>Edit comment:</p>
     {{ edit_comment_form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.id)) }}
     <br>
         {% for key, value in edit_comment_form.errors.items() %}
             {% for error_message in value %}
-                <li>{{ error_message }}</li>
+                <li id="edit_comment_form_error" comment_id="{{ comment.id }}">{{ error_message }}</li>
             {% endfor %}
         {% endfor %}
     <br>
-    {{ edit_comment_form.edit_comment_submit(class_="btn btn-primary") }}
+    {{ edit_comment_form.edit_comment_submit(class_="btn btn-primary", id="edit_comment_submit {}".format(comment.id)) }}
     <button type="button" id="delete_comment_btn {{ comment.id }}" data-delete_comment_btn="{{ comment.id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
     <button type="button" id="cancel_btn {{ comment.id }}" data-cancel_comment_btn="{{comment.id}}" onclick="cancelCommentBtn();" class="btn btn-danger">Cancel</button>  
   </form>

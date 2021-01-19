@@ -1,7 +1,7 @@
 function showEditStory(event) {
   var story_id = event.target.getAttribute('data-edit_story_btn');
   if (story_id != null) {
-    var story = document.getElementById("story " + story_id);
+    var story = document.getElementById("story");
     var edit_story_form = document.getElementById("edit_story_form_container");
     // 
     var story_title = document.getElementById("story_title "+ story_id).innerText;
@@ -12,7 +12,7 @@ function showEditStory(event) {
     var form_story_title_input = document.getElementById('form_story_title '+ story_id);
     var form_story_url_input = document.getElementById('form_story_url '+ story_id);
     var form_story_text_input = document.getElementById('form_story_text '+ story_id);
-    var form_method_type = document.getElementById("form_story_method_type "+ story_id);
+    // var form_method_type = document.getElementById("form_story_method_type "+ story_id);
     
     form_story_title_input.value = story_title
     form_story_url_input.value = story_url
@@ -26,7 +26,7 @@ function showEditStory(event) {
 function hideEditStory(event) {
   var story_id = event.target.getAttribute('data-cancel_story_btn');
   if (story_id != null) {
-    var story = document.getElementById("story " + story_id);
+    var story = document.getElementById("story");
     var edit_story_form = document.getElementById("edit_story_form_container");
     edit_story_form.style.display = "none";
     story.style.display = "block";
@@ -48,6 +48,28 @@ function deleteStory(event){
     }
   };
 };
+function editStoryFormErrors(event) {
+  var edit_story_form_error = document.getElementById('edit_story_form_error')
+  if (edit_story_form_error != null) {
+    var story = document.getElementById("story");
+    var edit_story_form = document.getElementById("edit_story_form_container");
+    story.style.display = "none";
+    edit_story_form.style.display = "block";
+    var story_text_input = document.querySelector("[id*='form_story_text ']");
+    story_text_input.focus()
+  }
+  else{
+    var story = document.getElementById("story");
+    if (document.getElementById("edit_story_form_container") != null){
+      var edit_story_form = document.getElementById("edit_story_form_container");
+      story.style.display = "block";
+      edit_story_form.style.display = "none";
+    }
+    else{
+      story.style.display = "block";
+    };
+  };
+};
 function editStoryBtn () {
   var container = document.getElementById("container");
   container.addEventListener("click", showEditStory, false);
@@ -60,3 +82,4 @@ function deleteStoryBtn () {
   var container = document.getElementById("container");
   container.addEventListener("click", deleteStory, false);
 };
+window.addEventListener("load", editStoryFormErrors, false);

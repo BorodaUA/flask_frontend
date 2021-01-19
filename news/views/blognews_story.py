@@ -9,7 +9,6 @@ from flask import (
 from flask_jwt_extended import jwt_optional, get_jwt_identity
 import requests
 from news.libs.comment_form import AddCommentForm, EditCommentForm
-
 from news.libs.story_form import StoryForm
 import os
 from dotenv import load_dotenv
@@ -26,8 +25,8 @@ def blognews_story_page(story_id):
     A view func for /blognews/story/<story_id> endpoint
     """
     #
-    edit_story_form = StoryForm()
-    add_comment_form = AddCommentForm()
+    edit_story_form = StoryForm(formdata=request.form)
+    add_comment_form = AddCommentForm(formdata=request.form)
     # edit_comment_form = EditCommentForm(
     #     request.form,
     #     prefix='edit_comment_form'
@@ -46,35 +45,37 @@ def blognews_story_page(story_id):
     except requests.exceptions.ConnectionError:
         return abort(404)
     api_response_blog_stories = api_request_blog_stories.json()
-    edit_comments_forms = []
-    for comment in api_response_blog_stories['comments']:
-        comment_id = comment['id']
-        edit_comment_form = EditCommentForm(
-            request.form,
-            prefix=f'{comment_id}'
-        )
-        edit_comment_form.comment_id = comment_id
-        edit_comments_forms.append(edit_comment_form)
-    if request.method == "GET":
-        if api_request_blog_stories.status_code == 200:
-            resp = make_response(
-                render_template(
-                    template_name_or_list="blognews_story.html",
-                    story=api_response_blog_stories,
-                    edit_story_form=edit_story_form,
-                    add_comment_form=add_comment_form,
-                    edit_comments_forms=edit_comments_forms,
-                    zip=zip
-                )
+    if api_request_blog_stories.status_code == 200:
+        edit_comments_forms = []
+        for comment in api_response_blog_stories['comments']:
+            comment_id = comment['id']
+            edit_comment_form = EditCommentForm(
+                formdata=request.form,
+                prefix=comment_id
             )
-            return resp
-        else:
-            abort(404)
+            edit_comment_form.comment_id = comment_id
+            edit_comments_forms.append(edit_comment_form)
+    else:
+        abort(404)
+    if request.method == "GET":
+        resp = make_response(
+            render_template(
+                template_name_or_list="blognews_story.html",
+                story=api_response_blog_stories,
+                edit_story_form=edit_story_form,
+                add_comment_form=add_comment_form,
+                edit_comments_forms=edit_comments_forms,
+                zip=zip
+            )
+        )
+        return resp
     if request.method == "POST":
         # edit story form
         if edit_story_form.edit_story_submit.data:
             if edit_story_form.validate_on_submit():
-                form_request_method = edit_story_form.method_type.data
+                form_request_method = (
+                    edit_story_form.story_form_method_type.data
+                )
                 BlogNewsStoryUrl = (
                     f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
                     f"/api/blognews/{story_id}"
@@ -84,6 +85,7 @@ def blognews_story_page(story_id):
                     "url": edit_story_form.story_url.data,
                     "text": edit_story_form.story_text.data,
                 }
+                # updating story
                 if form_request_method == "PATCH":
                     api_request_blognews_story = requests.patch(
                         BlogNewsStoryUrl,
@@ -99,6 +101,7 @@ def blognews_story_page(story_id):
                         return resp
                     else:
                         abort(404)
+                # deleting story
                 if form_request_method == "DELETE":
                     api_request_blognews_story = requests.delete(
                         BlogNewsStoryUrl,
@@ -129,7 +132,9 @@ def blognews_story_page(story_id):
         # add comment form
         if add_comment_form.add_comment_submit.data:
             if add_comment_form.validate_on_submit():
-                api_request_method = add_comment_form.method_type.data
+                api_request_method = (
+                    add_comment_form.add_comment_form_method_type.data
+                )
                 PostCommentUrl = (
                     f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
                     f"/api/blognews/{story_id}/comments"
@@ -169,7 +174,9 @@ def blognews_story_page(story_id):
         for edit_comment_form in edit_comments_forms:
             if edit_comment_form.edit_comment_submit.data:
                 if edit_comment_form.validate_on_submit():
-                    api_request_method = edit_comment_form.method_type.data
+                    api_request_method = (
+                        edit_comment_form.edit_comment_form_method_type.data
+                    )
                     PatchDeleteCommentUrl = (
                         f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
                         f"/api/blognews/{story_id}"
@@ -179,12 +186,28 @@ def blognews_story_page(story_id):
                         "by": current_user,
                         "text": edit_comment_form.comment_text.data,
                     }
+                    # updating comment
                     if api_request_method == "PATCH":
                         patch_comment_request = requests.patch(
                             PatchDeleteCommentUrl,
                             json=api_request_data
                         )
                         if patch_comment_request.status_code == 200:
+                            resp = make_response(
+                                redirect(url_for(
+                                    "news.blognews_story_page_func",
+                                    story_id=story_id,
+                                ), 302)
+                            )
+                            return resp
+                        else:
+                            abort(404)
+                    # deleting comment
+                    if api_request_method == "DELETE":
+                        delete_comment_request = requests.delete(
+                            PatchDeleteCommentUrl
+                        )
+                        if delete_comment_request.status_code == 200:
                             resp = make_response(
                                 redirect(url_for(
                                     "news.blognews_story_page_func",
@@ -206,3 +229,4 @@ def blognews_story_page(story_id):
                         )
                     )
                     return resp
+        abort(404)

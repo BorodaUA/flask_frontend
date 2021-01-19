@@ -28,7 +28,8 @@ function deleteComment(event) {
         var form = document.getElementById('edit_comment_form ' + comment_id)
         var form_method_type = document.getElementById('method_type '+ comment_id)
         form_method_type.value = "DELETE";
-        form.submit()
+        var form_submit = document.getElementById('edit_comment_submit '+comment_id)
+        form_submit.click()
         }
         else{
             return;
@@ -45,6 +46,44 @@ function hideEditComment(event) {
         edit_comment_form.style.display = "none";
     };
 };
+function editCommentFormErrors(event) {
+    var comments = document.querySelectorAll("[id*='comment ']");
+    for ( var i = 0; i < comments.length; i++) {
+        var comment = comments[i]
+        comment.style.display = "block"
+    };
+    var comments_forms = document.querySelectorAll("[id*='edit_comment_form_container ']");
+    for ( var i = 0; i < comments_forms.length; i++) {
+        var comment_form = comments_forms[i]
+        comment_form.style.display = "none"
+    };
+    var edit_comment_form_error = document.getElementById('edit_comment_form_error')
+    if (edit_comment_form_error != null) {
+        var comment_id = edit_comment_form_error.getAttribute('comment_id')
+        var comment = document.getElementById('comment '+comment_id)
+        var edit_comment_form = document.getElementById('edit_comment_form_container '+ comment_id)
+        comment.style.display = "none";
+        edit_comment_form.style.display = "block";
+        var comment_textarea = document.getElementById('comment_textarea '+comment_id)
+        comment_textarea.focus()
+        
+
+    }
+    else {
+        var comments = document.querySelectorAll("[id*='comment ']");
+        for ( var i = 0; i < comments.length; i++) {
+            var comment = comments[i]
+            comment.style.display = "block"
+
+        };
+        var comments_forms = document.querySelectorAll("[id*='edit_comment_form_container ']");
+        for ( var i = 0; i < comments_forms.length; i++) {
+            var comment_form = comments_forms[i]
+            comment_form.style.display = "none"
+
+        };
+    };
+};
 function editCommentBtn() {
     var comments = document.getElementById('comments');
     comments.addEventListener("click", showEditComment, false);
@@ -57,3 +96,4 @@ function cancelCommentBtn() {
     var comments = document.getElementById('comments'); 
     comments.addEventListener("click", hideEditComment, false);   
 };
+window.addEventListener("load", editCommentFormErrors, false);

@@ -5,7 +5,10 @@ from wtforms.widgets import HiddenInput
 
 
 class AddCommentForm(FlaskForm):
-    method_type = TextField(widget=HiddenInput(), default="POST")
+    add_comment_form_method_type = TextField(
+        widget=HiddenInput(),
+        default="POST"
+    )
     comment_id = TextField(widget=HiddenInput())
     comment_text = TextAreaField(
         validators=[
@@ -16,7 +19,7 @@ class AddCommentForm(FlaskForm):
                 min=2,
                 max=8192,
                 message=(
-                    'Comment text field must be between'
+                    'Comment text field must be between '
                     '2 and 8192 characters long.'
                 )
             )
@@ -26,7 +29,10 @@ class AddCommentForm(FlaskForm):
 
 
 class EditCommentForm(FlaskForm):
-    method_type = TextField(widget=HiddenInput(), default="PATCH")
+    edit_comment_form_method_type = TextField(
+        widget=HiddenInput(),
+        default="PATCH"
+    )
     comment_id = TextField(widget=HiddenInput())
     comment_text = TextAreaField(
         validators=[
@@ -37,7 +43,7 @@ class EditCommentForm(FlaskForm):
                 min=2,
                 max=8192,
                 message=(
-                    'Comment text field must be between'
+                    'Comment text field must be between '
                     '2 and 8192 characters long.'
                 )
             )

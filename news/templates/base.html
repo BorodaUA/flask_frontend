@@ -14,8 +14,8 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   <link rel="shortcut icon" href="{{ url_for('news.static', filename='favicon/monitor.png') }}">
   <link rel="stylesheet" href="{{ url_for('news.static', filename='css/base.css') }}">
-  <script src="{{ url_for('news.static', filename='js/story.js') }}"></script>
-  <script src="{{ url_for('news.static', filename='js/comment.js') }}"></script>
+  {% block head_content %}
+  {% endblock %}
 </head>
 <body>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-end">
