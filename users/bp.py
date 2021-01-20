@@ -4,14 +4,13 @@ from flask import (
     request,
     make_response,
     url_for,
-    redirect,
+    redirect
 )
+from users.views.user_profile import user_profile_page
 from users.libs.signin_form import LoginForm
 from users.libs.signup_form import SignupForm
-from news.libs.story_form import StoryForm
 import requests
 from flask_jwt_extended import (
-    jwt_optional,
     jwt_required,
     create_access_token,
     create_refresh_token,
@@ -167,43 +166,6 @@ def signin_page():
         return render_template("signin.html", form=signin_form)
 
 
-@jwt_optional
-def user_profile_page(username):
-    """
-    A view func for a '/users/profile/<username>/<page_number>' endpoint.
-    """
-    pagenumber = request.args.get("pagenumber")
-    if not pagenumber:
-        pagenumber = 1
-    edit_story_form = StoryForm()
-    USER_STORIES_URL = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/"
-        f"api/users/{username}/stories/?pagenumber={pagenumber}"
-    )
-    if request.method == "GET":
-        api_users_stories = requests.get(
-            USER_STORIES_URL
-        )
-        api_users_stories_response = api_users_stories.json()
-        if api_users_stories.status_code == 200:
-            return make_response(
-                render_template(
-                    "user_profile.html",
-                    stories=api_users_stories_response,
-                    story_view_func="news.story_page_func",
-                    current_view_func="users.user_profile_page_func",
-                    edit_story_form=edit_story_form,
-                    page_number=pagenumber
-                )
-            )
-        else:
-            return make_response(
-                render_template(
-                    "user_profile.html",
-                )
-            )
-
-
 users_bp.add_url_rule(
     "/signup", "signup_page_func", signup_page, methods=["GET", "POST"]
 )
@@ -217,7 +179,7 @@ users_bp.add_url_rule(
     methods=["GET"]
 )
 users_bp.add_url_rule(
-    "/users/profile/<username>/",
+    "/users/<username>/",
     "user_profile_page_func",
     user_profile_page,
     methods=["GET"],
