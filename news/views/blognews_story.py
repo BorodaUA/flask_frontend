@@ -27,10 +27,6 @@ def blognews_story_page(story_id):
     #
     edit_story_form = StoryForm(formdata=request.form)
     add_comment_form = AddCommentForm(formdata=request.form)
-    # edit_comment_form = EditCommentForm(
-    #     request.form,
-    #     prefix='edit_comment_form'
-    # )
     current_user = get_jwt_identity()
     #
     BLOG_NEWS_STORY_URL = (
