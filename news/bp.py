@@ -7,10 +7,10 @@ from uuid import uuid4
 import os
 from dotenv import load_dotenv
 from news.views.blognews import submit_story, blog_news_page
-from news.views.hackernews import new_news_page
 from news.views.story import story_page
 from news.views.blognews_story import blognews_story_page
 from news.views.hackernews_top_stories import hackernews_top_stories_page
+from news.views.hackernews_new_stories import hackernews_new_stories_page
 
 load_dotenv()
 
@@ -58,15 +58,15 @@ news_bp.add_url_rule(
 )
 news_bp.add_url_rule(
     rule="/hackernews/newest",
-    endpoint="new_news_page_func",
-    view_func=new_news_page,
+    endpoint="hackernews_new_stories_page_func",
+    view_func=hackernews_new_stories_page,
     methods=["GET"],
     defaults={"page_number": 1},
 )
 news_bp.add_url_rule(
     rule="/hackernews/newest/<int:page_number>",
-    endpoint="new_news_page_func",
-    view_func=new_news_page,
+    endpoint="hackernews_new_stories_page_func",
+    view_func=hackernews_new_stories_page,
     methods=["GET"]
 )
 news_bp.add_url_rule(
