@@ -1,7 +1,8 @@
 from flask import Blueprint
 from users.views.user_profile import (
     user_profile_page,
-    user_profile_stories_page
+    user_profile_stories_page,
+    user_profile_comments_page,
 )
 from users.views.user_signUP_IN_OUT import (
     signup_page,
@@ -35,5 +36,11 @@ users_bp.add_url_rule(
     "/users/<username>/stories",
     "user_profile_stories_page_func",
     user_profile_stories_page,
+    methods=["GET"],
+)
+users_bp.add_url_rule(
+    "/users/<username>/comments",
+    "user_profile_comments_page_func",
+    user_profile_comments_page,
     methods=["GET"],
 )

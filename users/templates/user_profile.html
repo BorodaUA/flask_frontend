@@ -10,6 +10,6 @@
 {% endif %}
 <br>
 <h2><a href="{{ url_for('users.user_profile_stories_page_func', username=username)}}">User's stories</a></h2>
-<h2><a href="#">User's comments</a></h2>
+<h2><a href="{{ url_for('users.user_profile_comments_page_func', username=username)}}">User's comments</a></h2>
 </div>
 {% endblock %}
