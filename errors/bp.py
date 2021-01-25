@@ -39,7 +39,6 @@ def no_jwt_on_protected_endpoint(message):
     Making a redirect to the /login endpoint, and unsets all jwt cookies.
     When no jwt cookies were provided on the protected endpoint.
     """
-    print(message)
     return expired_tokens()
 
 
@@ -49,7 +48,12 @@ def expired_tokens():
     """
     Making a redirect to the / endpoint, and unsets all jwt cookies.
     """
-    resp = make_response(redirect(url_for("news.top_news_page_func")), 302)
+    resp = make_response(
+        redirect(
+            url_for(
+                "news.hackernews_top_stories_page_func"
+            )
+        ), 302)
     unset_jwt_cookies(resp)
     return resp
 

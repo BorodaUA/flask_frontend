@@ -7,9 +7,10 @@ from uuid import uuid4
 import os
 from dotenv import load_dotenv
 from news.views.blognews import submit_story, blog_news_page
-from news.views.hackernews import new_news_page, top_news_page
+from news.views.hackernews import new_news_page
 from news.views.story import story_page
 from news.views.blognews_story import blognews_story_page
+from news.views.hackernews_top_stories import hackernews_top_stories_page
 
 load_dotenv()
 
@@ -44,15 +45,15 @@ def add_cookie(response):
 
 news_bp.add_url_rule(
     rule="/hackernews",
-    endpoint="top_news_page_func",
-    view_func=top_news_page,
+    endpoint="hackernews_top_stories_page_func",
+    view_func=hackernews_top_stories_page,
     methods=["GET"],
     defaults={"page_number": 1},
 )
 news_bp.add_url_rule(
     rule="/hackernews/<int:page_number>",
-    endpoint="top_news_page_func",
-    view_func=top_news_page,
+    endpoint="hackernews_top_stories_page_func",
+    view_func=hackernews_top_stories_page,
     methods=["GET"]
 )
 news_bp.add_url_rule(

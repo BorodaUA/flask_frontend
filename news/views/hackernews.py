@@ -4,7 +4,6 @@ from flask import (
     render_template,
     # request,
     make_response,
-    session,
     abort,
     # url_for,
 )
@@ -24,39 +23,6 @@ load_dotenv()
 
 BACKEND_SERVICE_NAME = os.environ.get("BACKEND_SERVICE_NAME")
 BACKEND_SERVICE_PORT = os.environ.get("BACKEND_SERVICE_PORT")
-
-
-@jwt_optional
-def top_news_page(page_number):
-    """
-    A view func for '/hackernews' endpoint,
-    after first page for /hackernews/<page_number>
-    """
-    HN_TOP_STORIES = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
-        f"hackernews/topstories/?pagenumber={page_number}"
-        )
-    try:
-        api_request = requests.get(HN_TOP_STORIES)
-    except requests.exceptions.ConnectionError:
-        api_request = None
-        api_response = None
-    if api_request:
-        if api_request.status_code == 200:
-            api_response = api_request.json()
-        elif api_request.status_code == 400:
-            abort(404)
-    else:
-        abort(404)
-    resp = make_response(
-        render_template(
-            "hn_topstories.html",
-            stories=api_response,
-            current_view_func="news.top_news_page_func",
-            story_view_func="news.story_page_func",
-        )
-    )
-    return resp
 
 
 @jwt_optional
