@@ -11,6 +11,8 @@ from news.views.blognews_story import blognews_story_page
 from news.views.hackernews_top_stories import hackernews_top_stories_page
 from news.views.hackernews_new_stories import hackernews_new_stories_page
 from news.views.hackernews_top_story import hackernews_top_story_page
+from news.views.hackernews_new_story import hackernews_new_story_page
+
 
 load_dotenv()
 
@@ -98,5 +100,11 @@ news_bp.add_url_rule(
     rule="/hackernews/topstory/<int:story_id>",
     endpoint="hackernews_top_story_page_func",
     view_func=hackernews_top_story_page,
+    methods=["GET", "POST"]
+)
+news_bp.add_url_rule(
+    rule="/hackernews/newstory/<int:story_id>",
+    endpoint="hackernews_new_story_page_func",
+    view_func=hackernews_new_story_page,
     methods=["GET", "POST"]
 )
