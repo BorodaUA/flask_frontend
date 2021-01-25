@@ -89,7 +89,13 @@ def logout_page():
     """
     A view func for a '/logout' endpoint.
     """
-    resp = make_response(redirect(url_for("news.top_news_page_func")))
+    resp = make_response(
+        redirect(
+            url_for(
+                "news.hackernews_top_stories_page_func"
+            )
+        )
+    )
     unset_jwt_cookies(resp)
     return resp
 
