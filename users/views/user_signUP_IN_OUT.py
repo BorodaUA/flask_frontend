@@ -40,7 +40,6 @@ def signup_page():
                 "password": signup_form.password.data,
                 "email_address": signup_form.email_address.data,
             }
-            api_request = requests.post(USER_SIGNUP_URL, json=api_request_data)
             try:
                 api_request = requests.post(
                     USER_SIGNUP_URL,
@@ -65,7 +64,10 @@ def signup_page():
                     expires_delta=datetime.timedelta(minutes=10),
                 )
                 signup_response = make_response(
-                    redirect(url_for("news.top_news_page_func"), 302)
+                    redirect(
+                        url_for(
+                            "news.hackernews_top_stories_page_func"
+                        ), 302)
                 )
                 set_access_cookies(signup_response, access_token)
                 set_refresh_cookies(signup_response, refresh_token)
