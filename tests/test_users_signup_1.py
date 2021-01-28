@@ -3,7 +3,9 @@ import sys
 import pytest
 from lxml import html
 import requests
-import json
+from faker import Faker
+import random
+import logging
 sys.path.append(os.getcwd())
 from flask_frontend import create_app # noqa
 
@@ -15,32 +17,31 @@ BACKEND_SERVICE_PORT = os.environ.get("BACKEND_SERVICE_PORT")
 @pytest.fixture(scope='function')
 def client():
     app = create_app("testing")
+    app.config['test_data'] = generate_fake_data()
     with app.test_client() as client:
         yield client
 
+        @app.teardown_appcontext
+        def delete_test_data(exception=None):
+            logging.debug('Shutting down the test.')
+            test_user_data = client.application.config['test_data']
+            UserDeleteUrl = (
+                f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
+                f"users/{test_user_data['username']}"
+            )
+            requests.delete(
+                UserDeleteUrl
+            )
 
-def delete_user(client):
-    response = client.post(
-        "/signin",
-        data={
-                'username': 'test_bob_2',
-                'password': '123456',
-            }
-    )
-    response = client.get("/users/profile/bob_2", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    UserDeleteUrl = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
-        f"users/{user_uuid}"
-        )
-    response = requests.delete(
-        UserDeleteUrl
-    )
-    response = client.get("/users/profile/bob_2", follow_redirects=True)
+
+def generate_fake_data():
+    '''
+    return Faker, test data
+    '''
+    fake = Faker()
+    fake_user = fake.profile()
+    fake_user['password'] = fake.password(length=random.randrange(6, 32))
+    return fake_user
 
 
 def test_config():
@@ -194,12 +195,8 @@ def test_signup_special_characters_in_username_password(client):
     )
     tree = html.fromstring(response.data)
     first_error = tree.xpath('//*/form/li[1]/text()')
-    second_error = tree.xpath('//*/form/li[2]/text()')
     assert (
         ['Username - String does not match expected pattern.'] == first_error
-    )
-    assert (
-        ['Password - String does not match expected pattern.'] == second_error
     )
 
 
@@ -208,31 +205,22 @@ def test_signup_valid_username_email_password(client):
     Test /signup endpoint
     with valid username, email_address, password
     """
-    delete_user(client=client)
+    test_user_data = client.application.config['test_data']
     response = client.post(
         "/signup",
         data={
-                'username': 'test_bob_2',
-                'email_address': 'test_bob_2@gmail.com',
-                'password': '123456',
+                'username': test_user_data['username'],
+                'email_address': test_user_data['mail'],
+                'password': test_user_data['password'],
             }
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    assert 'Hello: test_bob_2' == username[0]
-    UserDeleteUrl = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
-        f"users/{user_uuid}"
-        )
-    response = requests.delete(
-        UserDeleteUrl
+    response = client.get(
+        f"/users/{test_user_data['username']}",
+        follow_redirects=True
     )
-    response = json.loads(response.text)
-    assert 'User deleted' == response['message']
+    tree = html.fromstring(response.data)
+    username = tree.xpath('//*/h2[@id="username"]/a/text()')
+    assert test_user_data['username'] == username[0]
 
 
 def test_signup_2_times_valid_username_email_password(client):
@@ -240,27 +228,28 @@ def test_signup_2_times_valid_username_email_password(client):
     Test /signup endpoint 2 times
     with valid username, email_address, password
     """
+    test_user_data = client.application.config['test_data']
     response = client.post(
         "/signup",
         data={
-                'username': 'test_bob_2',
-                'email_address': 'test_bob_2@gmail.com',
-                'password': '123456',
+                'username': test_user_data['username'],
+                'email_address': test_user_data['mail'],
+                'password': test_user_data['password'],
             }
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
+    response = client.get(
+        f"/users/{test_user_data['username']}",
+        follow_redirects=True
+    )
     tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    assert 'Hello: test_bob_2' == username[0]
+    username = tree.xpath('//*/h2[@id="username"]/a/text()')
+    assert test_user_data['username'] == username[0]
     response = client.post(
         "/signup",
         data={
-                'username': 'test_bob_2',
-                'email_address': 'test_bob_2@gmail.com',
-                'password': '123456',
+                'username': test_user_data['username'],
+                'email_address': test_user_data['mail'],
+                'password': test_user_data['password'],
             }
     )
     tree = html.fromstring(response.data)
@@ -268,18 +257,3 @@ def test_signup_2_times_valid_username_email_password(client):
     assert (
         'User with this username already exist' == first_error
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    UserDeleteUrl = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
-        f"users/{user_uuid}"
-        )
-    response = requests.delete(
-        UserDeleteUrl
-    )
-    response = json.loads(response.text)
-    assert 'User deleted' == response['message']
