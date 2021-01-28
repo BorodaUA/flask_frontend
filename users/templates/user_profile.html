@@ -1,100 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 <div id="container" class="container">
-<h1>User Profile</h1>
-<h2 id="username">Hello: {{username}}</h2>
+<h2 id="username">User: <a href="{{ url_for('users.user_profile_page_func', username=username)}}">{{username}}</a></h2>
+{% if user_origin %}
 <h2 id="user_origin">Origin: {{user_origin}} </h2>
+{% endif %}
+{% if user_uuid %}
 <h2 id="user_uuid">User_uuid: {{user_uuid}} </h2>
-<h1>User`s stories:</h1>
-{% if username %}
-{% if stories %}
-{% for story in stories['items']%}
-<div id="story {{story.id}}" data-story_id="{{ story.id }}">
-    <div class="card">
-      <a class="title_url" href="#"><h5 class="card-header" id="story_title {{story.id}}">{{story.title}}</h5></a>
-      <div class="card-body">
-        <h5 class="card-title" id="story_text {{story.id}}">{{story.text}}</h5>
-        <h5 class="card-title" id="story_by {{story.id}}">{{story.by}}</h5>
-        <a href="{{story.url}}" class="btn btn-primary" id="story_url {{story.id}}">Story url</a>
-        <a href="#" class="btn btn-primary" id="story_score {{story.id}}">{{story.score}}</a>
-        {% if username == story.by and user_origin == story.origin %}
-          <button id="edit_story_btn" data-edit_story_btn="{{story.id}}" onclick="editStoryBtn();" class="btn btn-primary float-right">Edit</button>
-        {% endif %} 
-      </div>
-    </div>
-  </div>
-{% if username == story.by and user_origin == story.origin %}
-<div id="edit_story_form {{ story.id }}">
-  <form class="story_form {{ story.id }}" method="post" action="{{ url_for('news.story_page_func', story_id=story.id)}}">
-    {{ edit_story_form.csrf_token }}
-    {{ edit_story_form.method_type(class_="form-control", id="form_method_type {}".format(story.id)) }}
-    <p>Story Title:</p>
-    {{ edit_story_form.story_title(class_="form-control", id="form_story_title {}".format(story.id)) }}
-    <br>
-    <p>Story Url:</p>
-    {{ edit_story_form.story_url(class_="form-control", id="form_story_url {}".format(story.id) ) }}
-    <br>
-    <p>Story Text:</p>
-    {{ edit_story_form.story_text(class_="form-control", id="form_story_text {}".format(story.id)) }}
-    <br>
-    {% for key, value in edit_story_form.errors.items() %}
-      {% for error_message in value %}
-          <li>{{ error_message }}</li>
-      {% endfor %}
-    {% endfor %}
-    <br>
-    <input class="btn btn-primary" type="submit" value="Edit story"> 
-    <button id="delete_story_btn" data-delete_story_btn="{{ story.id }}" onclick="deleteStoryBtn();" class="btn btn-danger">Delete story</button>
-    <button type="button" id="cancel_story_btn {{ story.id }}" data-cancel_story_btn="{{story.id}}" onclick="cancelStoryBtn();" class="btn btn-danger">Cancel</button>  
-  </form>
-</div>
 {% endif %}
-{% endfor %}
 <br>
-<nav aria-label="Page navigation example">
-  <ul class="pagination pagination-lg justify-content-center">
-  {% if stories.has_previous %}
-      <li class="page-item">
-          <a class="page-link" href="{{ url_for(current_view_func, username=username, pagenumber=stories.previous_page)}}" tabindex="-1" aria-disabled="true">Previous</a>
-      </li>
-  {% else %}
-      <li class="page-item disabled">
-          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-      </li>
-  {% endif %}
-
-  {% if stories.current_page != 1 and stories.previous_page != 1  %}
-      <li class="page-item"><a class="page-link" href="{{ url_for(current_view_func, username=username, pagenumber=1)}}">1</a></li>
-      <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-  {% endif %}
-
-  {% if stories.previous_page  %}
-      <li class="page-item"><a class="page-link" href="{{ url_for(current_view_func, username=username, pagenumber=stories.previous_page)}}">{{stories.previous_page}}</a></li>
-  {% endif %}
-
-      <li class="page-item active"><a class="page-link" href="{{ url_for(current_view_func, username=username, pagenumber=stories.current_page,)}}">{{stories.current_page}}</a></li>
-  
-  {% if stories.next_page %}  
-      <li class="page-item"><a class="page-link" href="{{ url_for(current_view_func, username=username, pagenumber=stories.next_page)}}">{{stories.next_page}}</a></li>
-  {% endif %}  
-  {% if stories.current_page != stories.pages and stories.current_page != stories.pages - 1 %}
-      <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-      <li class="page-item"><a class="page-link" href="{{ url_for(current_view_func, username=username, pagenumber=stories.pages)}}">{{stories.pages}}</a></li>
-  {% endif %}
-
-  {% if stories.has_next %}
-      <li class="page-item">
-          <a class="page-link" href="{{ url_for(current_view_func, username=username, pagenumber=stories.next_page)}}">Next</a>
-      </li>
-  {% else %}
-      <li class="page-item disabled">
-          <a class="page-link" href="#">Next</a>
-      </li>
-  {% endif %}
-  </ul>
-</nav>
-<br>
-{% endif %}
-{% endif %}
+<h2><a href="{{ url_for('users.user_profile_stories_page_func', username=username)}}">User's stories</a></h2>
+<h2><a href="{{ url_for('users.user_profile_comments_page_func', username=username)}}">User's comments</a></h2>
 </div>
 {% endblock %}

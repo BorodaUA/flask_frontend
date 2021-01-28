@@ -27,13 +27,6 @@ body{
 .title_url:hover {
     color: inherit;
 }
-[id^="edit_comment_form"]{
-    display: none;
-}
-[id^="edit_story_form"]{
-    display: none;
-}
-
 #my_blog {
     color: rgb(85, 145, 240);
 }

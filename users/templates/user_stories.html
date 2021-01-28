@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="container" class="container">
+  <h2 id="username">User: <a href="{{ url_for('users.user_profile_page_func', username=username)}}">{{username}}</a></h2>
+{% if user_origin %}
+<h2 id="user_origin">Origin: {{user_origin}} </h2>
+{% endif %}
+{% if user_uuid %}
+<h2 id="user_uuid">User_uuid: {{user_uuid}} </h2>
+{% endif %}
+{% if username %}
+{% if stories %}
+<br>
+<h1>User's stories:</h1>
+{% for story in stories['items']%}
+<div id="story" data-story_id="{{ story.id }}">
+  <div class="card">
+    <a class="title_url" href="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}"><h5 class="card-header" id="story_title {{story.id}}">{{story.title}}</h5></a>
+    <div class="card-body">
+      <h5 class="card-title" id="story_text {{story.id}}">{{story.text}}</h5>
+      <a href="{{ url_for('users.user_profile_page_func', username=story.by)}}"><h5 class="card-title" id="story_by {{story.id}}">{{story.by}}</h5></a>
+      <a href="{{story.url}}" class="btn btn-primary" id="story_url {{story.id}}">Story url</a>
+      <a href="#" class="btn btn-primary" id="story_score {{story.id}}">{{story.score}}</a>
+    </div>
+  </div>
+</div>
+{% endfor %}
+<br>
+<nav aria-label="Page navigation example">
+  <ul class="pagination pagination-lg justify-content-center">
+  {% if stories.has_previous %}
+      <li class="page-item">
+          <a class="page-link" href="{{ url_for('users.user_profile_stories_page_func', username=username, pagenumber=stories.previous_page)}}" tabindex="-1" aria-disabled="true">Previous</a>
+      </li>
+  {% else %}
+      <li class="page-item disabled">
+          <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+      </li>
+  {% endif %}
+
+  {% if stories.current_page != 1 and stories.previous_page != 1  %}
+      <li class="page-item"><a class="page-link" href="{{ url_for('users.user_profile_stories_page_func', username=username, pagenumber=1)}}">1</a></li>
+      <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+  {% endif %}
+
+  {% if stories.previous_page  %}
+      <li class="page-item"><a class="page-link" href="{{ url_for('users.user_profile_stories_page_func', username=username, pagenumber=stories.previous_page)}}">{{stories.previous_page}}</a></li>
+  {% endif %}
+
+      <li class="page-item active"><a class="page-link" href="{{ url_for('users.user_profile_stories_page_func', username=username, pagenumber=stories.current_page,)}}">{{stories.current_page}}</a></li>
+  
+  {% if stories.next_page %}  
+      <li class="page-item"><a class="page-link" href="{{ url_for('users.user_profile_stories_page_func', username=username, pagenumber=stories.next_page)}}">{{stories.next_page}}</a></li>
+  {% endif %}  
+  {% if stories.current_page != stories.pages and stories.current_page != stories.pages - 1 %}
+      <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+      <li class="page-item"><a class="page-link" href="{{ url_for('users.user_profile_stories_page_func', username=username, pagenumber=stories.pages)}}">{{stories.pages}}</a></li>
+  {% endif %}
+
+  {% if stories.has_next %}
+      <li class="page-item">
+          <a class="page-link" href="{{ url_for('users.user_profile_stories_page_func', username=username, pagenumber=stories.next_page)}}">Next</a>
+      </li>
+  {% else %}
+      <li class="page-item disabled">
+          <a class="page-link" href="#">Next</a>
+      </li>
+  {% endif %}
+  </ul>
+</nav>
+<br>
+{% endif %}
+{% endif %}
+</div>
+{% endblock %}
+

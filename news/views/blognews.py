@@ -66,11 +66,11 @@ def submit_story():
 
 
 @jwt_optional
-def blog_news_page(page_number: 1):
+def blog_news_page(page_number):
     """
-    A view func for '/blognews/?pagenumber=n' endpoint
+    A view func for '/blognews' endpoint, after
+    first page for '/blognews/<page_number>' endpoint
     """
-    print(session)
     BlogNewsStoriesUrl = (
         f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}"
         f"/api/blognews/?pagenumber={page_number}"
@@ -78,22 +78,13 @@ def blog_news_page(page_number: 1):
     try:
         api_request = requests.get(BlogNewsStoriesUrl)
     except requests.exceptions.ConnectionError:
-        api_request = None
-        api_response = None
-    if api_request:
-        if api_request.status_code == 200:
-            api_response = api_request.json()
-        elif api_request.status_code == 400:
-            abort(404)
-    else:
         abort(404)
     if api_request.status_code == 200:
+        api_response = api_request.json()
         resp = make_response(
             render_template(
                 "blognews_stories.html",
                 stories=api_response,
-                current_view_func="news.blog_news_page_func",
-                story_view_func="news.story_page_func",
             )
         )
         return resp
