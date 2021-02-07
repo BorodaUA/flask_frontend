@@ -13,9 +13,9 @@
 <br>
 <h1>User's stories:</h1>
 {% for story in stories['items']%}
-<div id="story" data-story_id="{{ story.id }}">
+<div id="story {{ story.id }}" data-story_id="{{ story.id }}">
   <div class="card">
-    <a class="title_url" href="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}"><h5 class="card-header" id="story_title {{story.id}}">{{story.title}}</h5></a>
+    <a class="title_url {{ story.id }}" href="{{ url_for('news.blognews_story_page_func', story_id=story.id)}}"><h5 class="card-header" id="story_title {{story.id}}">{{story.title}}</h5></a>
     <div class="card-body">
       <h5 class="card-title" id="story_text {{story.id}}">{{story.text}}</h5>
       <a href="{{ url_for('users.user_profile_page_func', username=story.by)}}"><h5 class="card-title" id="story_by {{story.id}}">{{story.by}}</h5></a>

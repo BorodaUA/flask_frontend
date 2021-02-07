@@ -9,7 +9,9 @@ class StoryForm(FlaskForm):
     story_title = StringField(
         label='Story Title',
         validators=[
-            InputRequired(),
+            InputRequired(
+                message='Story Title - This field is required.'
+            ),
             Length(
                 min=3,
                 max=256,
@@ -20,7 +22,9 @@ class StoryForm(FlaskForm):
         ]
     )
     story_url = StringField(validators=[
-        InputRequired(),
+        InputRequired(
+            message='Story Url - This field is required.'
+        ),
         Length(
                 min=3,
                 max=256,
@@ -29,7 +33,9 @@ class StoryForm(FlaskForm):
             ),
         ])
     story_text = TextAreaField(validators=[
-        InputRequired(),
+        InputRequired(
+            message='Story Text - This field is required.'
+        ),
         Length(
                 min=3,
                 max=2048,
