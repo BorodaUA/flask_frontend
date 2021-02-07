@@ -3,7 +3,9 @@ import sys
 import pytest
 from lxml import html
 import requests
-import json
+from faker import Faker
+import random
+import logging
 sys.path.append(os.getcwd())
 from flask_frontend import create_app # noqa
 
@@ -15,16 +17,34 @@ BACKEND_SERVICE_PORT = os.environ.get("BACKEND_SERVICE_PORT")
 @pytest.fixture(scope='function')
 def client():
     app = create_app("testing")
+    app.config['test_data'] = generate_fake_data()
     with app.test_client() as client:
+
         yield client
 
+        @app.teardown_appcontext
+        def delete_test_data_after(exception=None):
+            logging.debug('Shutting down the test.')
+            test_user_data = client.application.config['test_data']
+            delete_test_user(username=test_user_data['username'])
 
-def test_blog(client):
-    """
-    Test GET / endpoint
-    """
-    response = client.get("/")
-    assert b"The Blog" in response.data
+
+def delete_test_user(username):
+    UserDeleteUrl = (
+        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
+        f"users/{username}"
+    )
+    return requests.delete(UserDeleteUrl)
+
+
+def generate_fake_data():
+    '''
+    return Faker, test data
+    '''
+    fake = Faker()
+    fake_user = fake.profile()
+    fake_user['password'] = fake.password(length=random.randrange(6, 32))
+    return fake_user
 
 
 def test_signin_no_required_fields(client):
@@ -107,42 +127,23 @@ def test_signin_long_required_fields(client):
     )
 
 
-def test_signin_special_characters_in_username_password(client):
-    """
-    Test /signin endpoint
-    with special characters in username, password
-    """
-    response = client.post(
-        "/signin",
-        data={
-                'username': 'bob_2@gmail.com',
-                'password': '123456!@#',
-            }
-    )
-    tree = html.fromstring(response.data)
-    first_error = tree.xpath('//*/form/li[1]/text()')
-    assert (
-        ['Password - String does not match expected pattern.'] == first_error
-    )
-
-
 def test_signin_valid_username_email_password_user_not_registered(client):
     """
     Test /sigin endpoint
     with valid username, password. user not registered
     """
+    test_user_data = client.application.config['test_data']
     response = client.post(
         "/signin",
         data={
-                'username': 'test_bob_2',
-                'email_address': 'test_bob_2@gmail.com',
-                'password': '123456',
+                'username': test_user_data['username'],
+                'email_address': test_user_data['mail'],
+                'password': test_user_data['password'],
             }
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    assert ['Hello: None'] == username
+    first_error = tree.xpath('//*/form/li[1]/text()')
+    assert ['Username - Username or Email address not found.'] == first_error
 
 
 def test_signin_valid_username_password(client):
@@ -150,18 +151,22 @@ def test_signin_valid_username_password(client):
     Test /signin endpoint
     with valid username, password. user previously registered and logged out.
     """
+    test_user_data = client.application.config['test_data']
     response = client.post(
         "/signup",
         data={
-                'username': 'test_bob_2',
-                'email_address': 'test_bob_2@gmail.com',
-                'password': '123456',
+                'username': test_user_data['username'],
+                'email_address': test_user_data['mail'],
+                'password': test_user_data['password'],
             }
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
+    response = client.get(
+        f"/users/{test_user_data['username']}",
+        follow_redirects=True
+    )
     tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    assert ['Hello: test_bob_2'] == username
+    username = tree.xpath('//*/h2[@id="username"]/a/text()')
+    assert test_user_data['username'] == username[0]
     response = client.get("/logout", follow_redirects=True)
     blognews_page = tree.xpath(
         '//*/a[contains(text(),"Blog News")]/text()'
@@ -170,47 +175,38 @@ def test_signin_valid_username_password(client):
     response = client.post(
         "/signin",
         data={
-                'username': 'test_bob_2',
-                'password': '123456',
-            }
+                'username': test_user_data['username'],
+                'password': test_user_data['password'],
+            },
+        follow_redirects=True
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    assert ['Hello: test_bob_2'] == username
-    UserDeleteUrl = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
-        f"users/{user_uuid}"
-        )
-    response = requests.delete(
-        UserDeleteUrl
-    )
-    response = json.loads(response.text)
-    assert 'User deleted' == response['message']
+    username = tree.xpath('//*/h2[@id="username"]/a/text()')
+    assert test_user_data['username'] == username[0]
 
 
 def test_signin_valid_email_password(client):
     """
     Test /signin endpoint
-    with valid username, password. user previously registered and logged out.
+    with valid email, password. user previously registered and logged out.
     """
+    test_user_data = client.application.config['test_data']
     response = client.post(
         "/signup",
         data={
-                'username': 'test_bob_2',
-                'email_address': 'test_bob_2@gmail.com',
-                'password': '123456',
+                'username': test_user_data['username'],
+                'email_address': test_user_data['mail'],
+                'password': test_user_data['password'],
             }
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
+    response = client.get(
+        f"/users/{test_user_data['username']}",
+        follow_redirects=True
+    )
     tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    assert ['Hello: test_bob_2'] == username
+    username = tree.xpath('//*/h2[@id="username"]/a/text()')
+    assert test_user_data['username'] == username[0]
     response = client.get("/logout", follow_redirects=True)
-    tree = html.fromstring(response.data)
     blognews_page = tree.xpath(
         '//*/a[contains(text(),"Blog News")]/text()'
     )
@@ -218,86 +214,11 @@ def test_signin_valid_email_password(client):
     response = client.post(
         "/signin",
         data={
-                'username': 'test_bob_2@gmail.com',
-                'password': '123456',
-            }
+                'username': test_user_data['mail'],
+                'password': test_user_data['password'],
+            },
+        follow_redirects=True
     )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
     tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    assert ['Hello: test_bob_2'] == username
-    UserDeleteUrl = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
-        f"users/{user_uuid}"
-        )
-    response = requests.delete(
-        UserDeleteUrl
-    )
-    response = json.loads(response.text)
-    assert 'User deleted' == response['message']
-
-
-def test_signin_valid_username_email_password_2_times(client):
-    """
-    Test /signin endpoint
-    with valid username, password. user previously registered and logged out.
-    2 times in a row.
-    """
-    response = client.post(
-        "/signup",
-        data={
-                'username': 'test_bob_2',
-                'email_address': 'test_bob_2@gmail.com',
-                'password': '123456',
-            }
-    )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    assert ['Hello: test_bob_2'] == username
-    response = client.get("/logout", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    blognews_page = tree.xpath(
-        '//*/a[contains(text(),"Blog News")]/text()'
-    )
-    assert ['Blog News'] == blognews_page
-    response = client.post(
-        "/signin",
-        data={
-                'username': 'test_bob_2',
-                'password': '123456',
-            }
-    )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    assert ['Hello: test_bob_2'] == username
-    response = client.post(
-        "/signin",
-        data={
-                'username': 'test_bob_2',
-                'password': '123456',
-            }
-    )
-    response = client.get("/users/profile/test_bob_2", follow_redirects=True)
-    tree = html.fromstring(response.data)
-    username = tree.xpath('//*/h2[@id="username"]/text()')
-    user_uuid = tree.xpath(
-        '//*/h2[@id="user_uuid"]/text()'
-    )[0].split(' ')[1]
-    assert ['Hello: test_bob_2'] == username
-    UserDeleteUrl = (
-        f"http://{BACKEND_SERVICE_NAME}:{BACKEND_SERVICE_PORT}/api/"
-        f"users/{user_uuid}"
-        )
-    response = requests.delete(
-        UserDeleteUrl
-    )
-    response = json.loads(response.text)
-    assert 'User deleted' == response['message']
+    username = tree.xpath('//*/h2[@id="username"]/a/text()')
+    assert test_user_data['username'] == username[0]
