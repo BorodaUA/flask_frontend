@@ -8,10 +8,10 @@
 {% if user_uuid %}
 <h2 id="user_uuid">User_uuid: {{user_uuid}} </h2>
 {% endif %}
+<h1>User's comments:</h1>
 {% if username %}
 {% if comments %}
 <br>
-<h1>User's comments:</h1>
 {% for comment in comments['items']%}
 <div id="comment" data-comment_id="{{ comment.id }}">
   <div class="card">

@@ -8,10 +8,10 @@
 {% if user_uuid %}
 <h2 id="user_uuid">User_uuid: {{user_uuid}} </h2>
 {% endif %}
+<h1>User's stories:</h1>
 {% if username %}
 {% if stories %}
 <br>
-<h1>User's stories:</h1>
 {% for story in stories['items']%}
 <div id="story {{ story.id }}" data-story_id="{{ story.id }}">
   <div class="card">

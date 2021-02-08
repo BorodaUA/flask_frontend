@@ -140,7 +140,7 @@ def user_profile_comments_page(username):
                 )
             )
             return resp
-        elif api_users_comments_response.status_code == 404:
+        elif api_users_comments.status_code == 404:
             resp = make_response(
                 render_template(
                     "user_comments.html",
