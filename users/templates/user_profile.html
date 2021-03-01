@@ -1,10 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>User Profile</h1>
-{% if user_data %}
-<h2>Hello user_data: {{user_data}}</h2>
-{% else %}
-<h2>Hello username: {{username}}</h2>
+<div id="container" class="container">
+<h2 id="username">User: <a href="{{ url_for('users.user_profile_page_func', username=username)}}">{{username}}</a></h2>
+{% if user_origin %}
+<h2 id="user_origin">Origin: {{user_origin}} </h2>
 {% endif %}
-<h2>Origin: {{user_origin}} </h2>
+{% if user_uuid %}
+<h2 id="user_uuid">User_uuid: {{user_uuid}} </h2>
+{% endif %}
+<br>
+<h2><a href="{{ url_for('users.user_profile_stories_page_func', username=username)}}">User's stories</a></h2>
+<h2><a href="{{ url_for('users.user_profile_comments_page_func', username=username)}}">User's comments</a></h2>
+</div>
 {% endblock %}

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired, InputRequired, Length, Email
+from wtforms.validators import InputRequired, Length, Email
 
 
 class SignupForm(FlaskForm):
@@ -19,6 +19,11 @@ class SignupForm(FlaskForm):
         "Email address",
         validators=[
             InputRequired(message="Email address is required."),
+            Length(
+                message="Email must be between 3 and 64 characters long.",
+                min=3,
+                max=64,
+            ),
             Email(message="Email is invalid."),
         ],
     )

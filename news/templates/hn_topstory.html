@@ -1,132 +1,93 @@
 {% extends "base.html" %}
+{% block head_content %}
+<script src="{{ url_for('news.static', filename='js/comment.js') }}"></script>
+{% endblock %}
 {% block content %}
 <div id="container" class="container">
 <br>
-<h1>Story page</h1>
-<div id="story {{story.hn_id}}" data-story_id="{{ story.hn_id }}">
+<h1 class="blognews_story" >Story page</h1>
+<!-- Story  -->
+<div class="story">
   <div class="card">
-    <a class="title_url" href="#"><h5 class="card-header" id="story_title {{story.hn_id}}">{{story.title}}</h5></a>
-    <div class="card-body">
-      {% if story.text %}
-      <h5 class="card-title" id="story_text {{story.hn_id}}">{{story.text}}</h5>
-      {% endif %}
-      <h5 class="card-title" id="story_by {{story.hn_id}}">{{story.by}}</h5>
-      <a href="{{story.url}}" class="btn btn-primary" id="story_url {{story.hn_id}}">Story url</a>
-      <a href="#" class="btn btn-primary" id="story_score {{story.hn_id}}">{{story.score}}</a>
+      <a class="title_url" target="_blank" href="https://news.ycombinator.com/item?id={{story.hn_id}}"><h5 class="card-header">{{story.title}}</h5></a>
+      <div class="card-body">
+          {% if story.text %}
+          <h5 id="story_text">{{story.text|safe}}</h5>
+          {% endif  %}
+          <a href="https://news.ycombinator.com/user?id={{story.by}}" target="_blank" class="hn_profile_url"><h5 class="card-title">{{story.by}}</h5></a>
+          {% if story.url %}
+              <a href="{{story.url}}" target="_blank" class="btn btn-primary">Story url</a>
+          {% else %}
+              <a href="https://news.ycombinator.com/item?id={{story.hn_id}}" target="_blank" class="btn btn-primary">Story url</a>
+          {% endif  %}
+          <a href="#" class="btn btn-primary">{{story.score}}</a>
+      </div>
     </div>
 </div>
-{% if user_uuid == story.by and user_origin == story.origin %}
-<br>
-<div id="edit_story_btn {{story.hn_id}}">
-  <button id="edit_story_btn" data-edit_story_btn="{{story.hn_id}}" onclick="editStoryBtn();" class="btn btn-primary">Edit</button>
-</div> 
-{% endif %} 
-</div>
-{% if user_uuid == story.by and user_origin == story.origin %}
-<div id="edit_story_form {{ story.hn_id }}">
-  <form class="story_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
-    {{ edit_story_form.csrf_token }}
-    {{ edit_story_form.method_type }}
-    <p>Story Title:</p>
-    {{ edit_story_form.story_title(class_="form-control") }}
-    <br>
-    <p>Story Url:</p>
-    {{ edit_story_form.story_url(class_="form-control") }}
-    <br>
-    <p>Story Text:</p>
-    {{ edit_story_form.story_text(class_="form-control") }}
-    <br>
-    {% for key, value in edit_story_form.errors.items() %}
-      {% for error_message in value %}
-          <li>{{ error_message }}</li>
-      {% endfor %}
-    {% endfor %}
-    <br>
-    <input class="btn btn-primary" type="submit" value="Edit story"> 
-    <button id="delete_story_btn" data-delete_story_btn="{{ story.hn_id }}" onclick="deleteStoryBtn();" class="btn btn-danger">Delete story</button>
-    <button type="button" id="cancel_story_btn {{ story.hn_id }}" data-cancel_story_btn="{{story.hn_id}}" onclick="cancelStoryBtn();" class="btn btn-danger">Cancel</button>  
-  </form>
-</div>
-{% endif %}
+<!-- Add comment form -->
 {% if user_uuid %}
 <br>
-<div id="add_comment_form">
-<form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
-  {{ form.csrf_token }}
-  {{ form.method_type }}
+<div id="add_comment_form_container">
+<form class="add_comment_form" method="post" action="{{ url_for('news.hackernews_top_story_page_func', story_id=story.hn_id)}}">
+  {{ add_comment_form.csrf_token }}
+  {{ add_comment_form.add_comment_form_method_type(id="add_comment_form_method_type") }}
   <p>Add comment:</p>
-  {{ form.comment_text(class_="form-control") }}
+  {{ add_comment_form.comment_text(class_="form-control") }}
   <br>
-  <input class="btn btn-primary" type="submit" value="Add Comment">  
+      {% for key, value in add_comment_form.errors.items() %}
+          {% for error_message in value %}
+              <li>{{ error_message }}</li>
+          {% endfor %}
+      {% endfor %}
+  <br>
+  {{ add_comment_form.add_comment_submit(class_="btn btn-primary") }}
 </form>
 </div>
 <br>
 {% endif %}
+<!-- Comments -->
 <h1>Comments:</h1>
 <div id="comments">
-<!-- my_blog comments -->
-{% for comment in story.comments%}
-{% if comment.origin == "my_blog" %}
+{% for comment, edit_comment_form in zip(story.comments, edit_comments_forms) %}
+<!-- Comment -->
 <div id="comment {{comment.id}}">
   <div class="card">
-      <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
+    {% if comment.hn_id %}
+      <a class="comment_by_link {{ comment.id }}" target="_blank" href="https://news.ycombinator.com/user?id={{comment.by}}"><h5 id="comment_by {{comment.id}}" class="card-header">{{comment.by}}</h5></a>
+    {% else %}
+      <a class="comment_by_link {{ comment.id }}" href="{{ url_for('users.user_profile_page_func', username=comment.by) }}"><h5 id="comment_by {{comment.id}}" class="card-header">{{comment.by}}</h5></a>
+    {% endif %}  
       <div class="card-body">
         <h5 id="comment_text {{ comment.id }}" class="card-title">{{comment.text|safe}}</h5>
       </div>
   </div>
-  {% if user_uuid == comment.by and user_origin == comment.origin %}
+  {% if username == comment.by and user_origin == comment.origin %}
   <button id="edit_comment_btn" onclick="editCommentBtn();" data-edit_comment_btn="{{comment.id}}" class="btn btn-primary">Edit</button>  
   {% endif %} 
 </div>
-{% if user_uuid == comment.by %}
-<div id="edit_comment_form {{ comment.id }}">
-  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
-    {{ form.csrf_token }}
-    {{ form.method_type(id="method_type {}".format(comment.id)) }}
-    {{ form.comment_id(id="comment_id {}".format(comment.id)) }}
+<!-- Comment form -->
+{% if username == comment.by %}
+<div id="edit_comment_form_container {{ comment.id }}">
+  <form name="ecf {{ comment.id }}" id="edit_comment_form {{ comment.id }}" method="post" action="{{ url_for('news.hackernews_top_story_page_func', story_id=story.hn_id)}}">
+    {{ edit_comment_form.csrf_token }}
+    {{ edit_comment_form.edit_comment_form_method_type(id="method_type {}".format(comment.id)) }}
+    
     <p>Edit comment:</p>
-    {{ form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.id)) }}
+    {{ edit_comment_form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.id)) }}
     <br>
-    <input class="btn btn-primary" type="submit" value="Edit Comment">
-    <button id="delete_comment_btn {{ comment.id }}" data-delete_comment_btn="{{ comment.id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
+        {% for key, value in edit_comment_form.errors.items() %}
+            {% for error_message in value %}
+                <li id="edit_comment_form_error" comment_id="{{ comment.id }}">{{ error_message }}</li>
+            {% endfor %}
+        {% endfor %}
+    <br>
+    {{ edit_comment_form.edit_comment_submit(class_="btn btn-primary", id="edit_comment_submit {}".format(comment.id)) }}
+    <button type="button" id="delete_comment_btn {{ comment.id }}" data-delete_comment_btn="{{ comment.id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
     <button type="button" id="cancel_btn {{ comment.id }}" data-cancel_comment_btn="{{comment.id}}" onclick="cancelCommentBtn();" class="btn btn-danger">Cancel</button>  
   </form>
 </div>
 {% endif %}  
 <br>
-{% endif %}
-{% endfor %}
-<!-- hacker_news comments -->
-{% for comment in story.comments%}
-{% if comment.origin == "hacker_news" %}
-<div id="comment {{comment.hn_id}}">
-  <div class="card">
-      <a class="title_url" href="{{ url_for('users.user_profile_page_func', username=comment.origin) }}"><h5 id="{{comment.origin}}" class="card-header">{{comment.by}}</h5></a>
-      <div class="card-body">
-        <h5 id="comment_text {{ comment.hn_id }}" class="card-title">{{comment.text|safe}}</h5>
-      </div>
-  </div>
-  {% if user_uuid == comment.by and user_origin == comment.origin %}
-  <button id="edit_comment_btn" onclick="editCommentBtn();" data-edit_comment_btn="{{comment.hn_id}}" class="btn btn-primary">Edit</button>  
-  {% endif %} 
-</div>
-{% if user_uuid == comment.by %}
-<div id="edit_comment_form {{ comment.hn_id }}">
-  <form class="comment_form" method="post" action="{{ url_for('news.story_page_func', story_id=story.hn_id)}}">
-    {{ form.csrf_token }}
-    {{ form.method_type(id="method_type {}".format(comment.hn_id)) }}
-    {{ form.comment_id(id="comment_id {}".format(comment.hn_id)) }}
-    <p>Edit comment:</p>
-    {{ form.comment_text(class_="form-control",id="comment_textarea {}".format(comment.hn_id)) }}
-    <br>
-    <input class="btn btn-primary" type="submit" value="Edit Comment">
-    <button id="delete_comment_btn {{ comment.hn_id }}" data-delete_comment_btn="{{ comment.hn_id }}" onclick="deleteCommentBtn();" class="btn btn-danger">Delete</button>
-    <button type="button" id="cancel_btn {{ comment.hn_id }}" data-cancel_comment_btn="{{comment.hn_id}}" onclick="cancelCommentBtn();" class="btn btn-danger">Cancel</button>  
-  </form>
-</div>
-{% endif %}  
-<br>
-{% endif %}
 {% endfor %}
 </div>
 </div>

@@ -9,11 +9,20 @@ def register_app_handlers(app):
     @app.context_processor
     def user_uuid():
         """
-        Global context processor that setting user_uuid from jwt_identity access_cookies.
+        Global context processor that setting user_uuid
+        from jwt_identity access_cookies.
         """
         current_user = get_jwt_identity()
         try:
             user_origin = get_jwt_claims()["user_origin"]
         except KeyError:
             user_origin = None
-        return dict(user_uuid=current_user, user_origin=user_origin)
+        try:
+            user_uuid = get_jwt_claims()["user_uuid"]
+        except KeyError:
+            user_uuid = None
+        return dict(
+            username=current_user,
+            user_origin=user_origin,
+            user_uuid=user_uuid,
+        )
