@@ -57,11 +57,11 @@ def signup_page():
                 access_token = create_access_token(
                     identity=user,
                     fresh=True,
-                    expires_delta=datetime.timedelta(minutes=10),
+                    expires_delta=datetime.timedelta(days=30),
                 )
                 refresh_token = create_refresh_token(
                     identity=user,
-                    expires_delta=datetime.timedelta(minutes=10),
+                    expires_delta=datetime.timedelta(days=30),
                 )
                 signup_response = make_response(
                     redirect(
@@ -135,10 +135,10 @@ def signin_page():
             )
             access_token = create_access_token(
                 identity=user, fresh=True,
-                expires_delta=datetime.timedelta(minutes=10),
+                expires_delta=datetime.timedelta(days=30),
             )
             refresh_token = create_refresh_token(
-                identity=user, expires_delta=datetime.timedelta(minutes=10),
+                identity=user, expires_delta=datetime.timedelta(days=30),
             )
             signin_response = make_response(
                 redirect(

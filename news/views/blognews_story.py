@@ -179,7 +179,6 @@ def blognews_story_page(story_id):
                         f"/comments/{edit_comment_form.comment_id}"
                     )
                     api_request_data = {
-                        "by": current_user,
                         "text": edit_comment_form.comment_text.data,
                     }
                     # updating comment
